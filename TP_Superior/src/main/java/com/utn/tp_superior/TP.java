@@ -144,8 +144,8 @@ con los t´erminos diagonales.
 
         Jacobiana = Matrix.inverse(Jacobiana);
 
-        double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + 7,
-            pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 49,
+        double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + Math.PI,
+            pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 7,
             pow((double) y.get(0), 3) * exp(-((double) x.get(0))) + (double) x.get(0) * ((double) y.get(0) + (double) z.get(0)) + 1};
 
         for (int i = 1; i <= maxIteraciones; i++) {
@@ -207,8 +207,8 @@ public static void puntoA() {
         Matrix Jacobiana = new Matrix(ins);
         Jacobiana = Matrix.inverse(Jacobiana);
 
-        double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + 7,
-            pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 49,
+        double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + Math.PI,
+            pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 7,
             pow((double) y.get(0), 3) * exp(-((double) x.get(0))) + (double) x.get(0) * ((double) y.get(0) + (double) z.get(0)) + 1};
 
         for (int i = 1; i <= maxIteraciones; i++) {
