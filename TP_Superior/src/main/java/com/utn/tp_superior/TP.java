@@ -2,10 +2,7 @@ package com.utn.tp_superior;
 
 import static java.lang.Math.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
 import org.apache.commons.lang3.time.StopWatch;
 
 /*
@@ -19,71 +16,135 @@ import org.apache.commons.lang3.time.StopWatch;
  */
 public class TP {
 
+    //VARIABLES GLOBALES
     public static int maxIteraciones = 200;
-    public static double TOL = pow(10, -130);
+    public static double TOL = pow(10, -30);
     public static double M[][];
     public static double[] B = null;
+    public static float M2[][];
+    public static float[] B2 = null;
+    static Gauss ge = new Gauss();
+
+    //PARAMETROS TP
+    public static int tamMatriz = 100;
+    public static int tamGS = 15;
+
     public static void main(String[] args) {
 
-  //============================================EJERCICIO 1===========================================
-        //============================================PUNTO a)===========================================
-        //puntoA();
-        //============================================PUNTO a)===========================================
-
-        //============================================PUNTO b)===========================================
-        //puntoB();
-        //============================================PUNTO b)===========================================
- //============================================EJERCICIO 2===========================================
-        //============================================PUNTO a)===========================================
-        int tamMatriz = 1000;
-        make_sys((int)tamMatriz);
+        /*
+        //EJERCICIO 1
+        //a)
+        puntoA();
         
-        System.out.println("\nMatriz A: "); 
+        //b)
+        puntoB();
+         */
+        //EJERCICIO 2
+        //a)
+        make_sys((int) tamMatriz);
+
+        //Imprimir matriz de entrada
+        /*
+        System.out.println("\nMatriz A: ");
         for (int i = 0; i < M.length; i++) {
             for (int j = 0; j < M.length; j++) {
-                 System.out.print(" "+M[i][j]);
+                System.out.print(" " + M[i][j]);
             }
-            System.out.print(" | "+B[i]);
+            System.out.print(" | " + B[i]);
             System.out.println("");
-        }  
-                
-        //============================================PUNTO b)===========================================
+        }
+         */
+        //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
+        double[] solucion;
+        solucion = ge.solve(M, B);
+        double[] residuo = solucion;
+        double residuoMax = 0;
+        for (int i = 0; i < solucion.length; i++) {
+            residuo[i] = ((producto2(M, solucion))[i] - B[i]);
+            if (residuo[i] > residuoMax) {
+                residuoMax = residuo[i];
+            }
+        }
+        System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
+        System.out.println();
+
+        //c)
+        make_sys2((int) tamMatriz);
+        float[] solucion2;
+        float residuoMax2 = 0;
+        solucion2 = ge.solve2(M2, B2);
+        float[] residuo2 = solucion2;
+        for (int i = 0; i < solucion2.length; i++) {
+            residuo2[i] = (float) ((producto3(M2, solucion2))[i] - B2[i]);
+            if (residuo2[i] > residuoMax2) {
+                residuoMax2 = residuo2[i];
+            }
+        }
+        System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
+        System.out.println();
         
-        // FUENTE DE ESTO http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
-        Gauss ge = new Gauss();
-        ge.solve(M,B);  
-        
-        //============================================PUNTO c)===========================================
-        
-    }      
- 
-public static void make_sys(int n){
-    double a=0;
-    M= new double[n][n];
-    B= new double[n];
+        //d)
+        double[] x0 = new double [B.length];
+        make_sys(15);
+        gauss_seidel(M, B, x0);
+    }
+
+    //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
+    public static void make_sys(int n) {
+        M = new double[n][n];
+        B = new double[n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                a = abs(i-j);
-                
-                if(i==j){
-                    M[i][j]=1;
+                int a = abs(i - j);
+
+                if (i == j) {
+                    M[i][j] = 1;
                 }
-                
-                if(i>j){
-                    M[i][j]=(4+a)/pow((2+a),2);
-                   }
-                
-                if(i<j){
-                    M[i][j]=(4+a)/pow((2+a),2);
-                   }
-                
+
+                if (i > j) {
+                    M[i][j] = (4 + a) / pow((2 + a), 2);
+                }
+
+                if (i < j) {
+                    M[i][j] = (4 + a) / pow((2 + a), 2);
+                }
+
             }
         }
-        for (int y = 0; y<n; y++){
-            B[y]=(2*y+1);
+        for (int y = 0; y < n; y++) {
+            B[y] = (2 * y + 1);
         }
     }
-public static double[] producto(Matrix A, double[] B) {
+
+    //Igual a la anterior, pero de simple precision
+    public static void make_sys2(int n) {
+        M2 = new float[n][n];
+        B2 = new float[n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int a = abs(i - j);
+
+                if (i == j) {
+                    M2[i][j] = 1;
+                }
+
+                if (i > j) {
+                    M2[i][j] = (float) ((4 + a) / (float) pow((2 + a), 2));
+                }
+
+                if (i < j) {
+                    M2[i][j] = (float) ((4 + a) / (float) pow((2 + a), 2));
+                }
+
+            }
+        }
+        for (int y = 0; y < n; y++) {
+            B2[y] = (float) (2 * y + 1);
+        }
+    }
+
+    //Funcion producto matrix (tipo Matrix) y vector
+    public static double[] producto(Matrix A, double[] B) {
         double suma;
         double result[] = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -97,20 +158,57 @@ public static double[] producto(Matrix A, double[] B) {
         }
         return result;
     }
-public static void puntoB() {
+
+    //Igual a producto(Matrix, double[]), pero cambia tipo Matrix por arreglo bidimensional
+    public static double[] producto2(double[][] A, double[] B) {
+        double suma;
+        int cols = A[0].length;
+        int rows = A.length;
+        double result[] = new double[cols];
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                suma = 0;
+                for (int k = 0; k < cols; k++) {
+                    suma += (A[i][k]) * B[k];
+                }
+                result[i] = suma;
+            }
+        }
+        return result;
+    }
+
+    //Igual a la anterior, pero de simple precision
+    public static float[] producto3(float[][] A, float[] B) {
+        float suma;
+        int cols = A[0].length;
+        int rows = A.length;
+        float result[] = new float[cols];
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                suma = 0;
+                for (int k = 0; k < cols; k++) {
+                    suma += (A[i][k]) * B[k];
+                }
+                result[i] = suma;
+            }
+        }
+        return result;
+    }
+
+    public static void puntoB() {
 
         /*
-.4.3. M´etodo de Jacobi
-En este m´etodo la matriz tangente que interviene en cada iteraci´on
+.4.3. Método de Jacobi
+En este método la matriz tangente que interviene en cada iteración
 se
-sustituye por otra con la misma diagonal pero con todos sus dem´as elementos
-nulos. M´as concretamente, denotando por
+sustituye por otra con la misma diagonal pero con todos sus demás elementos
+nulos. Más concretamente, denotando por
 a la matriz:
-Esta forma de proceder efectivamente reduce de forma notable el n´umero de
-operaciones (s´olo conlleva evaluar n funciones derivadas en lugar de n2 y adem´as
-la inversi´on de una matriz diagonal s´olo implica n operaciones). Pero s´olo es v´alida
+Esta forma de proceder efectivamente reduce de forma notable el número de
+operaciones (sólo conlleva evaluar n funciones derivadas en lugar de n2 y además
+la inversión de una matriz diagonal sólo implica n operaciones). Pero sólo es válida
 si los elementos no diagonales de la matriz jacobiana son ”pequeños” comparados
-con los t´erminos diagonales.
+con los términos diagonales.
 3.4.4.
 
 
@@ -190,7 +288,8 @@ con los t´erminos diagonales.
             }
         }
     }
-public static void puntoA() {
+
+    public static void puntoA() {
         StopWatch tiempoN = new StopWatch();
         tiempoN.reset();
         tiempoN.start();
@@ -252,5 +351,8 @@ public static void puntoA() {
                 break;
             }
         }
+    }
+    
+    public static void gauss_seidel(double[][] m, double[] b, double[] sol){        
     }
 }
