@@ -18,7 +18,7 @@ public class TP {
 
     //VARIABLES GLOBALES
     public static int maxIteraciones = 200;
-    public static long TOL = (long) pow(10, -2);
+    public static double TOL = pow(10, -30);
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
@@ -41,7 +41,7 @@ public class TP {
          */
         //EJERCICIO 2
         //a)
-        //make_sys((int) tamMatriz);
+        make_sys((int) tamMatriz);
 
         //Imprimir matriz de entrada
         /*
@@ -55,7 +55,7 @@ public class TP {
         }
          */
         //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
-       /* double[] solucion;
+        double[] solucion;
         solucion = ge.solve(M, B);
         double[] residuo = solucion;
         double residuoMax = 0;
@@ -67,9 +67,9 @@ public class TP {
         }
         System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
         System.out.println();
-        */
+
         //c)
-      /*  make_sys2((int) tamMatriz);
+        make_sys2((int) tamMatriz);
         float[] solucion2;
         float residuoMax2 = 0;
         solucion2 = ge.solve2(M2, B2);
@@ -82,17 +82,11 @@ public class TP {
         }
         System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
         System.out.println();
-      */  
-        //d)
-        //make_sys(tamGS);
-        double [][] me = {{12,4,4},{6,19,9},{8,10,20}};
-        double[] dea = {2,3,4};
-        double[] x = new double [3];
-        for (int i = 0; i < 3; i++) {
-            x[i]=1;
-        }
         
-        gauss_seidel(me, dea, x);
+        //d)
+        double[] x0 = new double [B.length];
+        make_sys(15);
+        gauss_seidel(M, B, x0);
     }
 
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
@@ -164,21 +158,7 @@ public class TP {
         }
         return result;
     }
-    //Funcion producto matrix (tipo Matrix) y Matriz
-    public static double[][] producto(Matrix A, double[][] B) {
-        double suma;
-        double result[][] = new double[B.length][B.length];
-        for (int i = 0; i < B.length ; i++) {
-            for (int j = 0; j < B.length; j++) {
-                suma = 0;
-                for (int k = 0; k < B.length; k++) {
-                    suma += (A.getValueAt(i, k)) * B[k][j];
-                }
-                result[i][j] = suma;
-            }
-        }
-        return result;
-    }
+
     //Igual a producto(Matrix, double[]), pero cambia tipo Matrix por arreglo bidimensional
     public static double[] producto2(double[][] A, double[] B) {
         double suma;
@@ -196,6 +176,7 @@ public class TP {
         }
         return result;
     }
+
     //Igual a la anterior, pero de simple precision
     public static float[] producto3(float[][] A, float[] B) {
         float suma;
@@ -213,24 +194,7 @@ public class TP {
         }
         return result;
     }
-    //Funcion producto Matriz y Vector
-    private static double[] producto(double[][] M, double[] b) {
-       double suma;
-        double result[] = new double[3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 1; j++) {
-                suma = 0;
-                for (int k = 0; k < 3; k++) {
-                    suma += M[i][k]* b[k];
-                }
-                result[i] = suma;
-            }
-        }
-        return result;
-  
-    }
-    
-     
+
     public static void puntoB() {
 
         /*
@@ -389,92 +353,6 @@ con los términos diagonales.
         }
     }
     
-    public static void gauss_seidel(double[][] m, double[] b, double[] sol){     
-    double aux=0,resta;
-    double[][] p = m,M;
-    Matrix auxMatriz;
-    double[] c,vecAux;
-    double[] Res= new double[3];
-    double anteriorX,anteriorY,anteriorZ;
-  
-    
-    //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
-    //Se verifica si es diagonal dominante
-    for(int i=0; i<b.length ; i++){
-         for (int j = 0; j < b.length; j++){
-            if(i!=j){aux += abs(m[i][j]);}
-         }
-         resta= abs(m[i][i])-aux;
-         if(resta < 0){System.out.println("NO ES MATRIZ DOMINANTE");break;}
-         aux=0;
-     }
-    //Matriz N
-        for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                if (i<j) {
-                    m[i][j]=0; 
-                }  
-            }
-        }
-    //Matriz N^-1
-    auxMatriz=new Matrix(m);
-    auxMatriz=Matrix.inverse(auxMatriz);
-    //Matriz P
-    for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                if (i>=j) {
-                    p[i][j]=0; 
-                }  
-            }
-        }
-    //Matriz M
-    M=producto(auxMatriz,p);
-    
-    //Vector c
-    c=producto(auxMatriz,sol);
-    
-    
-    //Primera aproximacion
-    vecAux = producto(M,b);
-    Res[0] = vecAux[0]+c[0];
-    Res[1] = vecAux[1]+c[1];
-    Res[2] = vecAux[2]+c[2];
-    anteriorX=Res[0];                     
-    anteriorY=Res[1];
-    anteriorZ=Res[2];
-        for (int i = 0; i <= maxIteraciones; i++) {
-            double xaux = abs((double) Res[0] - (double) anteriorX);
-            double yaux = abs((double) Res[1] - (double) anteriorY);
-            double zaux = abs((double) Res[2] - (double) anteriorZ);
-            double mayor = 0;
-
-            ArrayList mayores = new ArrayList();
-            mayores.add(xaux);
-            mayores.add(yaux);
-            mayores.add(zaux);
-            mayor = (double) Collections.max(mayores);
-            System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " + TOL);
-            int e=i+1;
-            System.out.println("Iteraciones: " + e);
-            System.out.println("Error: " + mayor);
-            System.out.println("x = " + Res[0]);
-            System.out.println("y = " + Res[1]);
-            System.out.println("z = " + Res[2]);
-            System.out.println("================================");
-
-            if (mayor <= TOL || i >= maxIteraciones) {
-                break;
-            } 
-             
-            vecAux = producto(M,Res);
-            Res[0] = vecAux[0]+c[0];
-            Res[1] = vecAux[1]+c[1];
-            Res[2] = vecAux[2]+c[2];
-            anteriorX=Res[0];                     
-            anteriorY=Res[1];
-            anteriorZ=Res[2];
-        }
+    public static void gauss_seidel(double[][] m, double[] b, double[] sol){        
     }
 }
- 

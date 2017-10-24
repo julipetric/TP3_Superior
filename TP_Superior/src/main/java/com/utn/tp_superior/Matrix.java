@@ -22,6 +22,8 @@ public class Matrix {
         this.ncols = dat[0].length;
     }
 
+
+
     public int getNrows() {
         return nrows;
     }
