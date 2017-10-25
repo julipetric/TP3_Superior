@@ -89,7 +89,7 @@ public class TP {
         double[] dea = {2,3,4};
         double[] x = new double [3];
         for (int i = 0; i < 3; i++) {
-            x[i]=500;
+            x[i]=1;
         }
         
         gauss_seidel(me, dea, x);
@@ -399,12 +399,14 @@ con los términos diagonales.
     double[][] M;
     Matrix auxMatriz;
     double[] c,vecAux;
-    double[] Res= new double[3];
+    double[] Res= new double[b.length];
+    double[] Aux = new double[b.length];
     double[] anterior = new double[b.length];
+    boolean bandera=true;
   
     
     
-    // x^(k+1)=Mx^(k)+c
+    // x^(k+1)=M*x^(k)+c
     //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
     //Se verifica si es diagonal dominante
     for(int i=0; i<b.length ; i++){
@@ -412,27 +414,22 @@ con los términos diagonales.
             if(i!=j){aux += abs(m[i][j]);}
          }
          resta= abs(m[i][i])-aux;
-         if(resta < 0){System.out.println("NO ES MATRIZ DOMINANTE");break;}
+         if(resta < 0){System.out.println("NO ES MATRIZ DOMINANTE");bandera=false;break;}
          aux=0;
      }
-    
-    
+
+if (bandera) {
     //Matriz N
-       for (int i = 0; i < b.length; i++) {
+     for (int i = 0; i < b.length; i++) {
             for (int j = 0; j < b.length; j++) {
                 if (i<j) {
                     m[i][j]=0; 
                 }
             }
         }
-        
-    
     //Matriz N^-1
     auxMatriz=new Matrix(m);
     auxMatriz=Matrix.inverse(auxMatriz);
-    
-    
-    
     //Matriz P
     for (int i = 0; i < b.length; i++) {
             for (int j = 0; j < b.length; j++) {
@@ -441,35 +438,32 @@ con los términos diagonales.
                 }  
             }
         }
-    
-    
-   
     //Matriz M
     M=producto(auxMatriz,p);
-    
     //Vector c
     c=producto(auxMatriz,b);
-     
     //Primera aproximacion
     vecAux = producto(M,sol);
+    
         for (int i = 0; i < c.length; i++) {
             Res[i] = vecAux[i]+c[i];
         }
         for (int i = 0; i < c.length; i++) {
             anterior[i]=0;
         }
-         
+        ArrayList mayores = new ArrayList(); 
         for (int i = 0; i < maxIteraciones; i++) {
             double mayor = 0;
-            ArrayList mayores = new ArrayList();
             for (int j = 0; j < Res.length; j++) {
-             Res[j]=abs((double) Res[j] - (double) anterior[j]);
-             mayores.add(Res[j]);   
+             Aux[j]=abs((double) Res[j] - (double) anterior[j]);
+             mayores.add(Aux[j]);   
             }
-             
+             for (int j = 0; j < mayores.size(); j++) {
+                 System.out.println(mayores.get(j));
+            }
             mayor = (double) Collections.max(mayores);
             System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " +TOL);
+            System.out.println("Tolerancia: " + pow(10,-5));
             int e=i+1;
             System.out.println("Iteraciones: " + e);
             System.out.println("Error: " + mayor);
@@ -478,18 +472,20 @@ con los términos diagonales.
             }
             System.out.println("================================");
               
-            if (mayor <= TOL || i >= maxIteraciones) {
+            if (mayor <= pow(10,-5) || i >= maxIteraciones) {
                 break;
             } 
 }
-            vecAux = producto(M,Res);
+            vecAux = producto(M,Aux);
+            
             for (int j = 0; j < vecAux.length; j++) {
                 anterior[j]=Res[j];
             }
             
             for (int i = 0; i < c.length; i++) {
             Res[i] = vecAux[i]+c[i];
-                } 
-        } 
+                }
+        }
+   } 
 }
  
