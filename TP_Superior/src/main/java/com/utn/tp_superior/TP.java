@@ -454,16 +454,15 @@ if (bandera) {
         ArrayList mayores = new ArrayList(); 
         for (int i = 0; i < maxIteraciones; i++) {
             double mayor = 0;
-            for (int j = 0; j < Res.length; j++) {
-             Aux[j]=abs((double) Res[j] - (double) anterior[j]);
-             mayores.add(Aux[j]);   
+            mayores.clear();
+            for (int d = 0; d < Res.length; d++) {
+             Aux[d]=abs((double) Res[d] - (double) anterior[d]);
+             mayores.add(Aux[d]);   
             }
-             for (int j = 0; j < mayores.size(); j++) {
-                 System.out.println(mayores.get(j));
-            }
+           
             mayor = (double) Collections.max(mayores);
             System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " + pow(10,-5));
+            System.out.println("Tolerancia: " + pow(10,-30));
             int e=i+1;
             System.out.println("Iteraciones: " + e);
             System.out.println("Error: " + mayor);
@@ -472,19 +471,21 @@ if (bandera) {
             }
             System.out.println("================================");
               
-            if (mayor <= pow(10,-5) || i >= maxIteraciones) {
+            if (mayor <= pow(10,-30) || i >= maxIteraciones) {
                 break;
             } 
-}
+
             vecAux = producto(M,Aux);
             
-            for (int j = 0; j < vecAux.length; j++) {
-                anterior[j]=Res[j];
+            for(int w = 0; w < vecAux.length; w++){
+            anterior[w]=Res[w];
+
             }
             
-            for (int i = 0; i < c.length; i++) {
-            Res[i] = vecAux[i]+c[i];
+            for (int k = 0; k < c.length; k++) {
+            Res[k] = vecAux[k]+c[k];
                 }
+             }
         }
    } 
 }
