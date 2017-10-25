@@ -17,7 +17,7 @@ import org.apache.commons.lang3.time.StopWatch;
 public class TP {
 
     //VARIABLES GLOBALES
-    public static int maxIteraciones = 200;
+    public static int maxIteraciones = 100000;
     public static long TOL = (long) pow(10, -4);
     public static double M[][];
     public static double[] B = null;
@@ -26,7 +26,7 @@ public class TP {
     static Gauss ge = new Gauss();
 
     //PARAMETROS TP
-    public static int tamMatriz = 100;
+    public static int tamMatriz = 3;
     public static int tamGS = 15;
 
     public static void main(String[] args) {
@@ -41,10 +41,10 @@ public class TP {
          */
         //EJERCICIO 2
         //a)
-        //make_sys((int) tamMatriz);
+        make_sys((int) tamMatriz);
 
         //Imprimir matriz de entrada
-        /*
+        
         System.out.println("\nMatriz A: ");
         for (int i = 0; i < M.length; i++) {
             for (int j = 0; j < M.length; j++) {
@@ -53,7 +53,7 @@ public class TP {
             System.out.print(" | " + B[i]);
             System.out.println("");
         }
-         */
+        
         //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
        /* double[] solucion;
         solucion = ge.solve(M, B);
@@ -85,14 +85,16 @@ public class TP {
       */  
         //d)
         //make_sys(tamGS);
-        double [][] me = {{12,4,4},{6,19,9},{8,10,20}};
-        double[] dea = {2,3,4};
+        /*double [][] me = {{3,1,1},{1,3,1},{2,1,4}};
+        double[] dea = {4,3,2};
+        */
         double[] x = new double [3];
         for (int i = 0; i < 3; i++) {
             x[i]=1;
         }
         
-        gauss_seidel(me, dea, x);
+        gauss_seidel(M, B, x);
+        
     }
 
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
@@ -387,7 +389,7 @@ con los términos diagonales.
     
     public static void gauss_seidel(double[][] m, double[] b, double[] sol){  
         
-    double aux=0,resta;
+    double aux=0;
     double[][] p = new double[b.length][b.length];
    
     for (int i = 0; i < b.length; i++) {
@@ -413,8 +415,7 @@ con los términos diagonales.
          for (int j = 0; j < b.length; j++){
             if(i!=j){aux += abs(m[i][j]);}
          }
-         resta= abs(m[i][i])-aux;
-         if(resta < 0){System.out.println("NO ES MATRIZ DOMINANTE");bandera=false;break;}
+         if(abs(m[i][i])<=aux){System.out.println("NO ES MATRIZ DOMINANTE");bandera=false;break;}
          aux=0;
      }
 
@@ -438,6 +439,8 @@ if (bandera) {
                 }  
             }
         }
+    
+    
     //Matriz M
     M=producto(auxMatriz,p);
     //Vector c
@@ -462,7 +465,7 @@ if (bandera) {
            
             mayor = (double) Collections.max(mayores);
             System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " + pow(10,-30));
+            System.out.println("Tolerancia: " + pow(4,-100));
             int e=i+1;
             System.out.println("Iteraciones: " + e);
             System.out.println("Error: " + mayor);
@@ -471,7 +474,7 @@ if (bandera) {
             }
             System.out.println("================================");
               
-            if (mayor <= pow(10,-30) || i >= maxIteraciones) {
+            if (mayor <= pow(4,-100) || i >= maxIteraciones) {
                 break;
             } 
 
@@ -484,9 +487,9 @@ if (bandera) {
             
             for (int k = 0; k < c.length; k++) {
             Res[k] = vecAux[k]+c[k];
-                }
-             }
+           }
         }
-   } 
+     }
+  } 
 }
  
