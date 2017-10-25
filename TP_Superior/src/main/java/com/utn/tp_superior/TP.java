@@ -18,7 +18,7 @@ public class TP {
 
     //VARIABLES GLOBALES
     public static int maxIteraciones = 200;
-    public static long TOL = (long) pow(10, -2);
+    public static long TOL = (long) pow(10, -4);
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
@@ -89,7 +89,7 @@ public class TP {
         double[] dea = {2,3,4};
         double[] x = new double [3];
         for (int i = 0; i < 3; i++) {
-            x[i]=1;
+            x[i]=500;
         }
         
         gauss_seidel(me, dea, x);
@@ -152,15 +152,13 @@ public class TP {
     //Funcion producto matrix (tipo Matrix) y vector
     public static double[] producto(Matrix A, double[] B) {
         double suma;
-        double result[] = new double[3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 1; j++) {
+        double result[] = new double[B.length];
+        for (int i = 0; i < B.length; i++) {
                 suma = 0;
-                for (int k = 0; k < 3; k++) {
+                for (int k = 0; k < B.length; k++) {
                     suma += (A.getValueAt(i, k)) * B[k];
                 }
                 result[i] = suma;
-            }
         }
         return result;
     }
@@ -214,17 +212,15 @@ public class TP {
         return result;
     }
     //Funcion producto Matriz y Vector
-    private static double[] producto(double[][] M, double[] b) {
-       double suma;
-        double result[] = new double[3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 1; j++) {
+    private static double[] producto(double[][] A, double[] b) {
+       double suma=0;
+        double result[] = new double[b.length];
+        for (int i = 0; i < b.length; i++) {
                 suma = 0;
-                for (int k = 0; k < 3; k++) {
-                    suma += M[i][k]* b[k];
+                for (int k = 0; k < b.length; k++) {
+                    suma += A[i][k]* b[k];
                 }
-                result[i] = suma;
-            }
+                result[i] = suma; 
         }
         return result;
   
@@ -281,7 +277,7 @@ con los términos diagonales.
         double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + Math.PI,
             pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 7,
             pow((double) y.get(0), 3) * exp(-((double) x.get(0))) + (double) x.get(0) * ((double) y.get(0) + (double) z.get(0)) + 1};
-
+      
         for (int i = 1; i <= maxIteraciones; i++) {
             double M[] = producto(Jacobiana, F);
             x.add(i, (double) x.get(i - 1) - M[0]);
@@ -389,15 +385,26 @@ con los términos diagonales.
         }
     }
     
-    public static void gauss_seidel(double[][] m, double[] b, double[] sol){     
+    public static void gauss_seidel(double[][] m, double[] b, double[] sol){  
+        
     double aux=0,resta;
-    double[][] p = m,M;
+    double[][] p = new double[b.length][b.length];
+   
+    for (int i = 0; i < b.length; i++) {
+            for(int j = 0; j < b.length; j++) {
+               p[i][j]=m[i][j];
+            }
+        }
+ 
+    double[][] M;
     Matrix auxMatriz;
     double[] c,vecAux;
     double[] Res= new double[3];
-    double anteriorX,anteriorY,anteriorZ;
+    double[] anterior = new double[b.length];
   
     
+    
+    // x^(k+1)=Mx^(k)+c
     //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
     //Se verifica si es diagonal dominante
     for(int i=0; i<b.length ; i++){
@@ -408,17 +415,24 @@ con los términos diagonales.
          if(resta < 0){System.out.println("NO ES MATRIZ DOMINANTE");break;}
          aux=0;
      }
+    
+    
     //Matriz N
-        for (int i = 0; i < b.length; i++) {
+       for (int i = 0; i < b.length; i++) {
             for (int j = 0; j < b.length; j++) {
                 if (i<j) {
                     m[i][j]=0; 
-                }  
+                }
             }
         }
+        
+    
     //Matriz N^-1
     auxMatriz=new Matrix(m);
     auxMatriz=Matrix.inverse(auxMatriz);
+    
+    
+    
     //Matriz P
     for (int i = 0; i < b.length; i++) {
             for (int j = 0; j < b.length; j++) {
@@ -427,54 +441,55 @@ con los términos diagonales.
                 }  
             }
         }
+    
+    
+   
     //Matriz M
     M=producto(auxMatriz,p);
     
     //Vector c
-    c=producto(auxMatriz,sol);
-    
-    
+    c=producto(auxMatriz,b);
+     
     //Primera aproximacion
-    vecAux = producto(M,b);
-    Res[0] = vecAux[0]+c[0];
-    Res[1] = vecAux[1]+c[1];
-    Res[2] = vecAux[2]+c[2];
-    anteriorX=Res[0];                     
-    anteriorY=Res[1];
-    anteriorZ=Res[2];
-        for (int i = 0; i <= maxIteraciones; i++) {
-            double xaux = abs((double) Res[0] - (double) anteriorX);
-            double yaux = abs((double) Res[1] - (double) anteriorY);
-            double zaux = abs((double) Res[2] - (double) anteriorZ);
+    vecAux = producto(M,sol);
+        for (int i = 0; i < c.length; i++) {
+            Res[i] = vecAux[i]+c[i];
+        }
+        for (int i = 0; i < c.length; i++) {
+            anterior[i]=0;
+        }
+         
+        for (int i = 0; i < maxIteraciones; i++) {
             double mayor = 0;
-
             ArrayList mayores = new ArrayList();
-            mayores.add(xaux);
-            mayores.add(yaux);
-            mayores.add(zaux);
+            for (int j = 0; j < Res.length; j++) {
+             Res[j]=abs((double) Res[j] - (double) anterior[j]);
+             mayores.add(Res[j]);   
+            }
+             
             mayor = (double) Collections.max(mayores);
             System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " + TOL);
+            System.out.println("Tolerancia: " +TOL);
             int e=i+1;
             System.out.println("Iteraciones: " + e);
             System.out.println("Error: " + mayor);
-            System.out.println("x = " + Res[0]);
-            System.out.println("y = " + Res[1]);
-            System.out.println("z = " + Res[2]);
+            for (int j = 0; j < c.length; j++) {
+              System.out.println("Var"+j+"= " + Res[j]);   
+            }
             System.out.println("================================");
-
+              
             if (mayor <= TOL || i >= maxIteraciones) {
                 break;
             } 
-             
+}
             vecAux = producto(M,Res);
-            Res[0] = vecAux[0]+c[0];
-            Res[1] = vecAux[1]+c[1];
-            Res[2] = vecAux[2]+c[2];
-            anteriorX=Res[0];                     
-            anteriorY=Res[1];
-            anteriorZ=Res[2];
-        }
-    }
+            for (int j = 0; j < vecAux.length; j++) {
+                anterior[j]=Res[j];
+            }
+            
+            for (int i = 0; i < c.length; i++) {
+            Res[i] = vecAux[i]+c[i];
+                } 
+        } 
 }
  
