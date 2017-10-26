@@ -73,7 +73,7 @@ public class Gauss {
         printSolution(solution);
         return solution;
     }
-    
+
     public float[] solve2(float[][] A, float[] B) {
         int N = B.length;
 
@@ -106,7 +106,7 @@ public class Gauss {
              * pivot within A and B *
              */
             for (int i = k + 1; i < N; i++) {
-                float factor = (float)(A[i][k] / A[k][k]);
+                float factor = (float) (A[i][k] / A[k][k]);
                 B[i] -= factor * B[k];
                 for (int j = k; j < N; j++) {
                     A[i][j] -= factor * A[k][j];
@@ -127,7 +127,7 @@ public class Gauss {
             for (int j = i + 1; j < N; j++) {
                 sum += A[i][j] * solution[j];
             }
-            solution[i] = (float)((B[i] - sum) / A[i][i]);
+            solution[i] = (float) ((B[i] - sum) / A[i][i]);
         }
         /**
          * Print solution *
@@ -135,7 +135,7 @@ public class Gauss {
         printSolution2(solution);
         return solution;
     }
-    
+
     public void printRowEchelonForm(double[][] A, double[] B) {
         int N = B.length;
         System.out.println("\nRow Echelon form : ");
@@ -147,7 +147,7 @@ public class Gauss {
         }
         System.out.println();
     }
-    
+
     public void printRowEchelonForm2(float[][] A, float[] B) {
         int N = B.length;
         System.out.println("\nRow Echelon form : ");
@@ -159,8 +159,6 @@ public class Gauss {
         }
         System.out.println();
     }
-    
-    
 
     public void printSolution(double[] sol) {
         int N = sol.length;
@@ -170,7 +168,7 @@ public class Gauss {
         }
         System.out.println();
     }
-    
+
     public void printSolution2(float[] sol) {
         int N = sol.length;
         System.out.println("\nSolución : ");

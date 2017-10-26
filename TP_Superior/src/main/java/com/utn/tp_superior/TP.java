@@ -18,19 +18,23 @@ public class TP {
 
     //VARIABLES GLOBALES
     public static int maxIteraciones = 100000;
-    public static long TOL = (long) pow(10, -4);
+    public static double TOL = pow(10, -100);
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
     public static float[] B2 = null;
     static Gauss ge = new Gauss();
+    public static double arregloResiduos[][] = null;
 
     //PARAMETROS TP
-    public static int tamMatriz = 3;
+    public static int tamMatriz;
+    public static int maxIteracionesMatriz=15;
     public static int tamGS = 15;
 
     public static void main(String[] args) {
-
+        
+        arregloResiduos = new double[3][maxIteracionesMatriz];
+        
         /*
         //EJERCICIO 1
         //a)
@@ -39,61 +43,66 @@ public class TP {
         //b)
         puntoB();
          */
+        
         //EJERCICIO 2
-        //a)
-        make_sys((int) tamMatriz);
+        //Estructura for para ir guardando las normas del error para graficar despues)
+        for (tamMatriz = 1; tamMatriz <= maxIteracionesMatriz; tamMatriz++) {
 
-        //Imprimir matriz de entrada
-        
-        System.out.println("\nMatriz A: ");
-        for (int i = 0; i < M.length; i++) {
-            for (int j = 0; j < M.length; j++) {
-                System.out.print(" " + M[i][j]);
+            //a)
+            make_sys((int) tamMatriz);
+
+            //Imprimir matriz de entrada
+            System.out.println("\nMatriz A: ");
+            for (int i = 0; i < M.length; i++) {
+                for (int j = 0; j < M.length; j++) {
+                    System.out.print(" " + M[i][j]);
+                }
+                System.out.print(" | " + B[i]);
+                System.out.println("");
             }
-            System.out.print(" | " + B[i]);
-            System.out.println("");
-        }
-        
-        //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
-       /* double[] solucion;
-        solucion = ge.solve(M, B);
-        double[] residuo = solucion;
-        double residuoMax = 0;
-        for (int i = 0; i < solucion.length; i++) {
-            residuo[i] = ((producto2(M, solucion))[i] - B[i]);
-            if (residuo[i] > residuoMax) {
-                residuoMax = residuo[i];
+
+            //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
+            double[] solucion;
+            solucion = ge.solve(M, B);
+            double[] residuo = solucion;
+            double residuoMax = 0;
+            for (int i = 0; i < solucion.length; i++) {
+                residuo[i] = ((producto2(M, solucion))[i] - B[i]);
+                if (residuo[i] > residuoMax) {
+                    residuoMax = residuo[i];
+                }
             }
-        }
-        System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
-        System.out.println();
-        */
-        //c)
-      /*  make_sys2((int) tamMatriz);
-        float[] solucion2;
-        float residuoMax2 = 0;
-        solucion2 = ge.solve2(M2, B2);
-        float[] residuo2 = solucion2;
-        for (int i = 0; i < solucion2.length; i++) {
-            residuo2[i] = (float) ((producto3(M2, solucion2))[i] - B2[i]);
-            if (residuo2[i] > residuoMax2) {
-                residuoMax2 = residuo2[i];
+            arregloResiduos[0][tamMatriz-1] = residuoMax;
+            System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
+            System.out.println();
+
+            //c)
+            make_sys2((int) tamMatriz);
+            float[] solucion2;
+            float residuoMax2 = 0;
+            solucion2 = ge.solve2(M2, B2);
+            float[] residuo2 = solucion2;
+            for (int i = 0; i < solucion2.length; i++) {
+                residuo2[i] = (float) ((producto3(M2, solucion2))[i] - B2[i]);
+                if (residuo2[i] > residuoMax2) {
+                    residuoMax2 = residuo2[i];
+                }
             }
+            arregloResiduos[1][tamMatriz-1] = residuoMax2;
+            System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
+            System.out.println();
         }
-        System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
-        System.out.println();
-      */  
         //d)
         //make_sys(tamGS);
-        /*double [][] me = {{3,1,1},{1,3,1},{2,1,4}};
+        double [][] me = {{3,1,1},{1,3,1},{2,1,4}};
         double[] dea = {4,3,2};
-        */
-        double[] x = new double [3];
-        for (int i = 0; i < 3; i++) {
-            x[i]=1;
-        }
         
-        gauss_seidel(M, B, x);
+        double[] x = new double[3];
+        for (int i = 0; i < 3; i++) {
+            x[i] = 1;
+        }
+
+        gauss_seidel(me, dea, x);
         
     }
 
@@ -156,19 +165,20 @@ public class TP {
         double suma;
         double result[] = new double[B.length];
         for (int i = 0; i < B.length; i++) {
-                suma = 0;
-                for (int k = 0; k < B.length; k++) {
-                    suma += (A.getValueAt(i, k)) * B[k];
-                }
-                result[i] = suma;
+            suma = 0;
+            for (int k = 0; k < B.length; k++) {
+                suma += (A.getValueAt(i, k)) * B[k];
+            }
+            result[i] = suma;
         }
         return result;
     }
+
     //Funcion producto matrix (tipo Matrix) y Matriz
     public static double[][] producto(Matrix A, double[][] B) {
         double suma;
         double result[][] = new double[B.length][B.length];
-        for (int i = 0; i < B.length ; i++) {
+        for (int i = 0; i < B.length; i++) {
             for (int j = 0; j < B.length; j++) {
                 suma = 0;
                 for (int k = 0; k < B.length; k++) {
@@ -179,6 +189,7 @@ public class TP {
         }
         return result;
     }
+
     //Igual a producto(Matrix, double[]), pero cambia tipo Matrix por arreglo bidimensional
     public static double[] producto2(double[][] A, double[] B) {
         double suma;
@@ -196,6 +207,7 @@ public class TP {
         }
         return result;
     }
+
     //Igual a la anterior, pero de simple precision
     public static float[] producto3(float[][] A, float[] B) {
         float suma;
@@ -213,22 +225,22 @@ public class TP {
         }
         return result;
     }
+
     //Funcion producto Matriz y Vector
     private static double[] producto(double[][] A, double[] b) {
-       double suma=0;
+        double suma = 0;
         double result[] = new double[b.length];
         for (int i = 0; i < b.length; i++) {
-                suma = 0;
-                for (int k = 0; k < b.length; k++) {
-                    suma += A[i][k]* b[k];
-                }
-                result[i] = suma; 
+            suma = 0;
+            for (int k = 0; k < b.length; k++) {
+                suma += A[i][k] * b[k];
+            }
+            result[i] = suma;
         }
         return result;
-  
+
     }
-    
-     
+
     public static void puntoB() {
 
         /*
@@ -279,7 +291,7 @@ con los términos diagonales.
         double F[] = {(double) x.get(0) + (double) y.get(0) + (double) z.get(0) + Math.PI,
             pow((double) x.get(0), 2) + pow((double) y.get(0), 2) + pow((double) z.get(0), 2) - 7,
             pow((double) y.get(0), 3) * exp(-((double) x.get(0))) + (double) x.get(0) * ((double) y.get(0) + (double) z.get(0)) + 1};
-      
+
         for (int i = 1; i <= maxIteraciones; i++) {
             double M[] = producto(Jacobiana, F);
             x.add(i, (double) x.get(i - 1) - M[0]);
@@ -386,110 +398,112 @@ con los términos diagonales.
             }
         }
     }
-    
-    public static void gauss_seidel(double[][] m, double[] b, double[] sol){  
-        
-    double aux=0;
-    double[][] p = new double[b.length][b.length];
-   
-    for (int i = 0; i < b.length; i++) {
-            for(int j = 0; j < b.length; j++) {
-               p[i][j]=m[i][j];
+
+    public static void gauss_seidel(double[][] m, double[] b, double[] sol) {
+
+        double aux = 0;
+        double[][] p = new double[b.length][b.length];
+
+        for (int i = 0; i < b.length; i++) {
+            for (int j = 0; j < b.length; j++) {
+                p[i][j] = m[i][j];
             }
         }
- 
-    double[][] M;
-    Matrix auxMatriz;
-    double[] c,vecAux;
-    double[] Res= new double[b.length];
-    double[] Aux = new double[b.length];
-    double[] anterior = new double[b.length];
-    boolean bandera=true;
-  
-    
-    
-    // x^(k+1)=M*x^(k)+c
-    //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
-    //Se verifica si es diagonal dominante
-    for(int i=0; i<b.length ; i++){
-         for (int j = 0; j < b.length; j++){
-            if(i!=j){aux += abs(m[i][j]);}
-         }
-         if(abs(m[i][i])<=aux){System.out.println("NO ES MATRIZ DOMINANTE");bandera=false;break;}
-         aux=0;
-     }
 
-if (bandera) {
-    //Matriz N
-     for (int i = 0; i < b.length; i++) {
+        double[][] M;
+        Matrix auxMatriz;
+        double[] c, vecAux;
+        double[] Res = new double[b.length];
+        double[] Aux = new double[b.length];
+        double[] anterior = new double[b.length];
+        boolean bandera = true;
+
+        // x^(k+1)=M*x^(k)+c
+        //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
+        //Se verifica si es diagonal dominante
+        for (int i = 0; i < b.length; i++) {
             for (int j = 0; j < b.length; j++) {
-                if (i<j) {
-                    m[i][j]=0; 
+                if (i != j) {
+                    aux += abs(m[i][j]);
+                }
+            }
+            if (abs(m[i][i]) <= aux) {
+                System.out.println("NO ES MATRIZ DOMINANTE");
+                bandera = false;
+                break;
+            }
+            aux = 0;
+        }
+
+        if (bandera) {
+            //Matriz N
+            for (int i = 0; i < b.length; i++) {
+                for (int j = 0; j < b.length; j++) {
+                    if (i < j) {
+                        m[i][j] = 0;
+                    }
+                }
+            }
+            //Matriz N^-1
+            auxMatriz = new Matrix(m);
+            auxMatriz = Matrix.inverse(auxMatriz);
+            //Matriz P
+            for (int i = 0; i < b.length; i++) {
+                for (int j = 0; j < b.length; j++) {
+                    if (i >= j) {
+                        p[i][j] = 0;
+                    }
+                }
+            }
+
+            //Matriz M
+            M = producto(auxMatriz, p);
+            //Vector c
+            c = producto(auxMatriz, b);
+            //Primera aproximacion
+            vecAux = producto(M, sol);
+
+            for (int i = 0; i < c.length; i++) {
+                Res[i] = vecAux[i] + c[i];
+            }
+            for (int i = 0; i < c.length; i++) {
+                anterior[i] = 0;
+            }
+            ArrayList mayores = new ArrayList();
+            for (int i = 0; i < maxIteraciones; i++) {
+                double mayor = 0;
+                mayores.clear();
+                for (int d = 0; d < Res.length; d++) {
+                    Aux[d] = abs((double) Res[d] - (double) anterior[d]);
+                    mayores.add(Aux[d]);
+                }
+
+                mayor = (double) Collections.max(mayores);
+                System.out.println("=======Punto d)=========");
+                System.out.println("Tolerancia: " + TOL);
+                int e = i + 1;
+                System.out.println("Iteraciones: " + e);
+                System.out.println("Error: " + mayor);
+                for (int j = 0; j < c.length; j++) {
+                    System.out.println("Var" + j + "= " + Res[j]);
+                }
+                System.out.println("================================");
+
+                if (mayor <= TOL || i >= maxIteraciones) {
+                    break;
+                }
+
+                vecAux = producto(M, Aux);
+
+                for (int w = 0; w < vecAux.length; w++) {
+                    anterior[w] = Res[w];
+
+                }
+
+                for (int k = 0; k < c.length; k++) {
+                    Res[k] = vecAux[k] + c[k];
                 }
             }
         }
-    //Matriz N^-1
-    auxMatriz=new Matrix(m);
-    auxMatriz=Matrix.inverse(auxMatriz);
-    //Matriz P
-    for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                if (i>=j) {
-                    p[i][j]=0; 
-                }  
-            }
-        }
-    
-    
-    //Matriz M
-    M=producto(auxMatriz,p);
-    //Vector c
-    c=producto(auxMatriz,b);
-    //Primera aproximacion
-    vecAux = producto(M,sol);
-    
-        for (int i = 0; i < c.length; i++) {
-            Res[i] = vecAux[i]+c[i];
-        }
-        for (int i = 0; i < c.length; i++) {
-            anterior[i]=0;
-        }
-        ArrayList mayores = new ArrayList(); 
-        for (int i = 0; i < maxIteraciones; i++) {
-            double mayor = 0;
-            mayores.clear();
-            for (int d = 0; d < Res.length; d++) {
-             Aux[d]=abs((double) Res[d] - (double) anterior[d]);
-             mayores.add(Aux[d]);   
-            }
-           
-            mayor = (double) Collections.max(mayores);
-            System.out.println("=======Punto d)=========");
-            System.out.println("Tolerancia: " + pow(4,-100));
-            int e=i+1;
-            System.out.println("Iteraciones: " + e);
-            System.out.println("Error: " + mayor);
-            for (int j = 0; j < c.length; j++) {
-              System.out.println("Var"+j+"= " + Res[j]);   
-            }
-            System.out.println("================================");
-              
-            if (mayor <= pow(4,-100) || i >= maxIteraciones) {
-                break;
-            } 
-
-            vecAux = producto(M,Aux);
-            
-            for(int w = 0; w < vecAux.length; w++){
-            anterior[w]=Res[w];
-
-            }
-            
-            for (int k = 0; k < c.length; k++) {
-            Res[k] = vecAux[k]+c[k];
-           }
-        }
-     }
-  } 
+    }
 }
- 
