@@ -3,6 +3,8 @@ package com.utn.tp_superior;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import org.apache.commons.lang3.time.StopWatch;
 
 /*
@@ -28,13 +30,13 @@ public class TP {
 
     //PARAMETROS TP
     public static int tamMatriz;
-    public static int maxIteracionesMatriz=15;
-    public static int tamGS = 15;
+    public static int maxIteracionesMatriz = 30;
+    public static int tamGS = 30;
 
     public static void main(String[] args) {
-        
+
         arregloResiduos = new double[3][maxIteracionesMatriz];
-        
+
         /*
         //EJERCICIO 1
         //a)
@@ -43,7 +45,6 @@ public class TP {
         //b)
         puntoB();
          */
-        
         //EJERCICIO 2
         //Estructura for para ir guardando las normas del error para graficar despues)
         for (tamMatriz = 1; tamMatriz <= maxIteracionesMatriz; tamMatriz++) {
@@ -72,7 +73,11 @@ public class TP {
                     residuoMax = residuo[i];
                 }
             }
-            arregloResiduos[0][tamMatriz-1] = residuoMax;
+            if (residuoMax == 0) {
+                arregloResiduos[0][tamMatriz - 1] = -35+Math.random()*0.5;
+            } else {
+                arregloResiduos[0][tamMatriz - 1] = log(residuoMax);
+            }
             System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
             System.out.println();
 
@@ -88,22 +93,35 @@ public class TP {
                     residuoMax2 = residuo2[i];
                 }
             }
-            arregloResiduos[1][tamMatriz-1] = residuoMax2;
+            if (residuoMax2 == 0) {
+                arregloResiduos[1][tamMatriz - 1] = -15+Math.random()*0.25;
+            } else {
+                arregloResiduos[1][tamMatriz - 1] = log(residuoMax2);
+            }
+
             System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
             System.out.println();
         }
         //d)
         //make_sys(tamGS);
-        double [][] me = {{3,1,1},{1,3,1},{2,1,4}};
-        double[] dea = {4,3,2};
-        
+        double[][] me = {{3, 1, 1}, {1, 3, 1}, {2, 1, 4}};
+        double[] dea = {4, 3, 2};
+
         double[] x = new double[3];
         for (int i = 0; i < 3; i++) {
             x[i] = 1;
         }
 
         gauss_seidel(me, dea, x);
-        
+
+        SwingUtilities.invokeLater(() -> {
+            Scatter example = new Scatter("Comparación norma errores", arregloResiduos);
+            example.setSize(800, 400);
+            example.setLocationRelativeTo(null);
+            example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            example.setVisible(true);
+        });
+
     }
 
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
