@@ -30,12 +30,13 @@ public class TP {
 
     //PARAMETROS TP
     public static int tamMatriz;
-    public static int maxIteracionesMatriz = 30;
-    public static int tamGS = 30;
+    public static int maxTamMatriz = 75;
+    public static int tamGS;
+    public static int maxTamGS = 75;
 
     public static void main(String[] args) {
 
-        arregloResiduos = new double[3][maxIteracionesMatriz];
+        arregloResiduos = new double[3][maxTamMatriz];
 
         /*
         //EJERCICIO 1
@@ -46,8 +47,8 @@ public class TP {
         puntoB();
          */
         //EJERCICIO 2
-        //Estructura for para ir guardando las normas del error para graficar despues)
-        for (tamMatriz = 1; tamMatriz <= maxIteracionesMatriz; tamMatriz++) {
+        //Estructuras for para ir guardando las normas del error para graficar despues)
+        for (tamMatriz = 1; tamMatriz <= maxTamMatriz; tamMatriz++) {
 
             //a)
             make_sys((int) tamMatriz);
@@ -74,7 +75,7 @@ public class TP {
                 }
             }
             if (residuoMax == 0) {
-                arregloResiduos[0][tamMatriz - 1] = -35+Math.random()*0.5;
+                arregloResiduos[0][tamMatriz - 1] = -35 + Math.random() * 0.5;
             } else {
                 arregloResiduos[0][tamMatriz - 1] = log(residuoMax);
             }
@@ -94,7 +95,7 @@ public class TP {
                 }
             }
             if (residuoMax2 == 0) {
-                arregloResiduos[1][tamMatriz - 1] = -15+Math.random()*0.25;
+                arregloResiduos[1][tamMatriz - 1] = -15 + Math.random() * 0.25;
             } else {
                 arregloResiduos[1][tamMatriz - 1] = log(residuoMax2);
             }
@@ -102,29 +103,47 @@ public class TP {
             System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
             System.out.println();
         }
-        //d)
-        //make_sys(tamGS);
-        double[][] me = {{3, 1, 1}, {1, 3, 1}, {2, 1, 4}};
-        double[] dea = {4, 3, 2};
 
-        double[] x = new double[3];
-        for (int i = 0; i < 3; i++) {
-            x[i] = 1;
+        for (tamGS = 1; tamGS <= maxTamGS; tamGS++) {
+            //d)
+            make_sys(tamGS);
+            //double[][] me = {{3, 1, 1}, {1, 3, 1}, {2, 1, 4}};
+            //double[] dea = {4, 3, 2};
+
+            double[] x = B;
+            /*
+            for (int i = 0; i < 3; i++) {
+                x[i] = 1;
+            }
+            */
+
+            double[] solGS = gauss_seidel(M, B, x);
+
+            double[] residuo3 = solGS;
+            double residuoMax3 = 0;
+            for (int i = 0; i < solGS.length; i++) {
+                residuo3[i] = ((producto2(M, solGS))[i] - B[i]);
+                if (residuo3[i] > residuoMax3) {
+                    residuoMax3 = residuo3[i];
+                }
+            }
+            if (residuoMax3 == 0) {
+                arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
+            } else {
+                arregloResiduos[2][tamGS - 1] = log(residuoMax3);
+            }
         }
-
-        gauss_seidel(me, dea, x);
-
+        //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
             Scatter example = new Scatter("Comparación norma errores", arregloResiduos);
-            example.setSize(800, 400);
+            example.setSize(2000, 1000);
             example.setLocationRelativeTo(null);
             example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             example.setVisible(true);
         });
-
     }
-
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
+
     public static void make_sys(int n) {
         M = new double[n][n];
         B = new double[n];
@@ -417,7 +436,7 @@ con los términos diagonales.
         }
     }
 
-    public static void gauss_seidel(double[][] m, double[] b, double[] sol) {
+    public static double[] gauss_seidel(double[][] m, double[] b, double[] sol) {
 
         double aux = 0;
         double[][] p = new double[b.length][b.length];
@@ -523,5 +542,7 @@ con los términos diagonales.
                 }
             }
         }
+        return Res;
     }
+
 }
