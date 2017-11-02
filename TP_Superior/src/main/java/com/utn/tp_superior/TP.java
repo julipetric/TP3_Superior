@@ -140,7 +140,7 @@ public class TP {
                 }
             }
             if (residuoMax3 == 0) {
-                //arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
+                arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
             } else {
                 arregloResiduos[2][tamGS - 1] = log(residuoMax3);
             }
@@ -475,7 +475,6 @@ con los términos diagonales.
             }
         }
 
-        double[][] M;
         Matrix auxMatriz;
         double[] vecAux;
         Res = new double[b.length];
