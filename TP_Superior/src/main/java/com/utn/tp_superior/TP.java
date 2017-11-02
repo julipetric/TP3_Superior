@@ -20,32 +20,44 @@ public class TP {
 
     //VARIABLES GLOBALES
     public static int maxIteraciones = 100000;
-    public static double TOL = pow(10, -100);
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
     public static float[] B2 = null;
     static Gauss ge = new Gauss();
     public static double arregloResiduos[][] = null;
+    public static int ultimaIter;
+    public static double mayorAux;
+    public static int e = 0;
+    public static double[] Res;
+    public static int iteracionesD;
+    public static double[] c;
 
     //PARAMETROS TP
+    public static double TOL = pow(10, -35);
     public static int tamMatriz;
-    public static int maxTamMatriz = 75;
+    public static int maxTamMatriz = 10;
     public static int tamGS;
-    public static int maxTamGS = 75;
+    public static int maxTamGS = 10;
+
+    //BANDERAS FORMATO
+    public static boolean mostrarMatrizA = false;
+    public static boolean printRowEchelon = false;
+    public static boolean imprimirSolucion = false;
+    //bandera booleana para mosrtar o no el error, en general muestra 0.0
+    public static boolean mostrarError = false;
 
     public static void main(String[] args) {
 
         arregloResiduos = new double[3][maxTamMatriz];
 
-        /*
         //EJERCICIO 1
         //a)
         puntoA();
-        
+
         //b)
         puntoB();
-         */
+
         //EJERCICIO 2
         //Estructuras for para ir guardando las normas del error para graficar despues)
         for (tamMatriz = 1; tamMatriz <= maxTamMatriz; tamMatriz++) {
@@ -54,13 +66,15 @@ public class TP {
             make_sys((int) tamMatriz);
 
             //Imprimir matriz de entrada
-            System.out.println("\nMatriz A: ");
-            for (int i = 0; i < M.length; i++) {
-                for (int j = 0; j < M.length; j++) {
-                    System.out.print(" " + M[i][j]);
+            if (mostrarMatrizA) {
+                System.out.println("\nMatriz A: ");
+                for (int i = 0; i < M.length; i++) {
+                    for (int j = 0; j < M.length; j++) {
+                        System.out.print(" " + M[i][j]);
+                    }
+                    System.out.print(" | " + B[i]);
+                    System.out.println("");
                 }
-                System.out.print(" | " + B[i]);
-                System.out.println("");
             }
 
             //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
@@ -111,12 +125,10 @@ public class TP {
             //double[] dea = {4, 3, 2};
 
             double[] x = B;
-            /*
-            for (int i = 0; i < 3; i++) {
-                x[i] = 1;
-            }
-            */
 
+            //for (int i = 0; i < 3; i++) {
+            //    x[i] = 1;
+            //}
             double[] solGS = gauss_seidel(M, B, x);
 
             double[] residuo3 = solGS;
@@ -128,11 +140,21 @@ public class TP {
                 }
             }
             if (residuoMax3 == 0) {
-                arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
+                //arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
             } else {
                 arregloResiduos[2][tamGS - 1] = log(residuoMax3);
             }
         }
+
+        System.out.println("=======Punto d)=========");
+        System.out.println("Tolerancia: 10^" + (log(TOL) / log(10)));
+        System.out.println("Iteraciones: " + iteracionesD);
+        System.out.println("Error: " + mayorAux);
+        for (int j = 0; j < c.length; j++) {
+            System.out.println("Var" + j + "= " + Res[j]);
+        }
+        System.out.println("================================");
+
         //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
             Scatter example = new Scatter("Comparación norma errores", arregloResiduos);
@@ -141,6 +163,7 @@ public class TP {
             example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             example.setVisible(true);
         });
+
     }
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
 
@@ -348,28 +371,31 @@ con los términos diagonales.
             double xaux = abs((double) x.get(i) - (double) x.get(i - 1));
             double yaux = abs((double) y.get(i) - (double) y.get(i - 1));
             double zaux = abs((double) z.get(i) - (double) z.get(i - 1));
-            double mayor = 0;
+            mayorAux = 0;
 
             ArrayList mayores = new ArrayList();
             mayores.add(xaux);
             mayores.add(yaux);
             mayores.add(zaux);
-            mayor = (double) Collections.max(mayores);
-            System.out.println("=======Punto b)=========");
-            System.out.println("Tolerancia: " + TOL);
-            System.out.println("Iteraciones: " + i);
-            System.out.println("Error: " + mayor);
-            System.out.println("x = " + x.get(i));
-            System.out.println("y = " + y.get(i));
-            System.out.println("z = " + z.get(i));
-            System.out.println("================================");
+            mayorAux = (double) Collections.max(mayores);
 
-            if (mayor <= TOL || i >= maxIteraciones) {
+            if (mayorAux <= TOL || i >= maxIteraciones) {
                 tiempoJ.stop();
                 System.out.println("Tiempo transcurrido por metodo de Jacobi: " + tiempoJ.toString() + " ms");
                 break;
             }
+            ultimaIter = i;
         }
+        System.out.println("=======Punto b)=========");
+        System.out.println("Tolerancia: 10^" + (log(TOL)) / log(10));
+        System.out.println("Iteraciones: " + ultimaIter);
+        if (mostrarError) {
+            System.out.println("Error: " + mayorAux);
+        }
+        System.out.println("x = " + x.get(ultimaIter));
+        System.out.println("y = " + y.get(ultimaIter));
+        System.out.println("z = " + z.get(ultimaIter));
+        System.out.println("================================");
     }
 
     public static void puntoA() {
@@ -418,22 +444,24 @@ con los términos diagonales.
             mayores.add(xaux);
             mayores.add(yaux);
             mayores.add(zaux);
-            mayor = (double) Collections.max(mayores);
-            System.out.println("=======Punto a)=========");
-            System.out.println("Tolerancia: " + TOL);
-            System.out.println("Iteraciones: " + i);
-            System.out.println("Error: " + mayor);
-            System.out.println("x = " + x.get(i));
-            System.out.println("y = " + y.get(i));
-            System.out.println("z = " + z.get(i));
-            System.out.println("================================");
-
-            if (mayor <= TOL || i >= maxIteraciones) {
+            mayorAux = (double) Collections.max(mayores);
+            if (mayorAux <= TOL || i >= maxIteraciones) {
                 tiempoN.stop();
                 System.out.println("Tiempo transcurrido por metodo de Newton: " + tiempoN.toString() + " ms");
                 break;
             }
+            ultimaIter = i;
         }
+        System.out.println("=======Punto a)=========");
+        System.out.println("Tolerancia: 10^" + (log(TOL)) / log(10));
+        System.out.println("Iteraciones: " + ultimaIter);
+        if (mostrarError) {
+            System.out.println("Error: " + mayorAux);
+        }
+        System.out.println("x = " + x.get(ultimaIter));
+        System.out.println("y = " + y.get(ultimaIter));
+        System.out.println("z = " + z.get(ultimaIter));
+        System.out.println("================================");
     }
 
     public static double[] gauss_seidel(double[][] m, double[] b, double[] sol) {
@@ -449,29 +477,15 @@ con los términos diagonales.
 
         double[][] M;
         Matrix auxMatriz;
-        double[] c, vecAux;
-        double[] Res = new double[b.length];
+        double[] vecAux;
+        Res = new double[b.length];
         double[] Aux = new double[b.length];
         double[] anterior = new double[b.length];
         boolean bandera = true;
 
         // x^(k+1)=M*x^(k)+c
         //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
-        //Se verifica si es diagonal dominante
-        for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                if (i != j) {
-                    aux += abs(m[i][j]);
-                }
-            }
-            if (abs(m[i][i]) <= aux) {
-                System.out.println("NO ES MATRIZ DOMINANTE");
-                bandera = false;
-                break;
-            }
-            aux = 0;
-        }
-
+        
         if (bandera) {
             //Matriz N
             for (int i = 0; i < b.length; i++) {
@@ -513,18 +527,10 @@ con los términos diagonales.
                 for (int d = 0; d < Res.length; d++) {
                     Aux[d] = abs((double) Res[d] - (double) anterior[d]);
                     mayores.add(Aux[d]);
+                    iteracionesD = i + 1;
                 }
 
-                mayor = (double) Collections.max(mayores);
-                System.out.println("=======Punto d)=========");
-                System.out.println("Tolerancia: " + TOL);
-                int e = i + 1;
-                System.out.println("Iteraciones: " + e);
-                System.out.println("Error: " + mayor);
-                for (int j = 0; j < c.length; j++) {
-                    System.out.println("Var" + j + "= " + Res[j]);
-                }
-                System.out.println("================================");
+                mayorAux = (double) Collections.max(mayores);
 
                 if (mayor <= TOL || i >= maxIteraciones) {
                     break;
@@ -532,10 +538,7 @@ con los términos diagonales.
 
                 vecAux = producto(M, Aux);
 
-                for (int w = 0; w < vecAux.length; w++) {
-                    anterior[w] = Res[w];
-
-                }
+                System.arraycopy(Res, 0, anterior, 0, vecAux.length);
 
                 for (int k = 0; k < c.length; k++) {
                     Res[k] = vecAux[k] + c[k];

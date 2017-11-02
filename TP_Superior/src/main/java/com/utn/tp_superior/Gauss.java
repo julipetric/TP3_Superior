@@ -9,7 +9,7 @@ package com.utn.tp_superior;
  *
  * @author Juli
  */
-public class Gauss {
+public class Gauss extends TP {
 
     public double[] solve(double[][] A, double[] B) {
         int N = B.length;
@@ -54,7 +54,9 @@ public class Gauss {
         /**
          * Print row echelon form *
          */
-        printRowEchelonForm(A, B);
+        if (printRowEchelon) {
+            printRowEchelonForm(A, B);
+        }
 
         /**
          * back substitution *
@@ -70,7 +72,7 @@ public class Gauss {
         /**
          * Print solution *
          */
-        printSolution(solution);
+        if(imprimirSolucion)printSolution(solution);
         return solution;
     }
 
@@ -116,7 +118,9 @@ public class Gauss {
         /**
          * Print row echelon form *
          */
-        printRowEchelonForm2(A, B);
+        if (printRowEchelon) {
+            printRowEchelonForm2(A, B);
+        }
 
         /**
          * back substitution *
