@@ -49,6 +49,7 @@ public class Gauss extends TP {
                     A[i][j] -= factor * A[k][j];
                 }
             }
+            iteracionesB = k;
         }
 
         /**
@@ -72,7 +73,10 @@ public class Gauss extends TP {
         /**
          * Print solution *
          */
-        if(imprimirSolucion)printSolution(solution);
+        if (imprimirSolucion) {
+            printSolution(solution);
+        }
+
         return solution;
     }
 
@@ -114,6 +118,7 @@ public class Gauss extends TP {
                     A[i][j] -= factor * A[k][j];
                 }
             }
+            iteracionesC = k;
         }
         /**
          * Print row echelon form *
@@ -136,7 +141,9 @@ public class Gauss extends TP {
         /**
          * Print solution *
          */
-        printSolution2(solution);
+        if (imprimirSolucion) {
+            printSolution2(solution);
+        }
         return solution;
     }
 
@@ -160,24 +167,6 @@ public class Gauss extends TP {
                 System.out.printf("%.3f ", A[i][j]);
             }
             System.out.printf("| %.3f\n", B[i]);
-        }
-        System.out.println();
-    }
-
-    public void printSolution(double[] sol) {
-        int N = sol.length;
-        System.out.println("\nSolución : ");
-        for (int i = 0; i < N; i++) {
-            System.out.printf("%.3f ", sol[i]);
-        }
-        System.out.println();
-    }
-
-    public void printSolution2(float[] sol) {
-        int N = sol.length;
-        System.out.println("\nSolución : ");
-        for (int i = 0; i < N; i++) {
-            System.out.printf("%.3f ", sol[i]);
         }
         System.out.println();
     }

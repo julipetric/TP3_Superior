@@ -19,7 +19,7 @@ import org.apache.commons.lang3.time.StopWatch;
 public class TP {
 
     //VARIABLES GLOBALES
-    public static int maxIteraciones = 100000;
+    public static int maxIteraciones = 1000;
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
@@ -30,15 +30,19 @@ public class TP {
     public static double mayorAux;
     public static int e = 0;
     public static double[] Res;
+    public static int iteracionesB;
+    public static int iteracionesC;
     public static int iteracionesD;
     public static double[] c;
+    public static double[] solucionB = null;
+    public static float[] solucionC = null;
 
     //PARAMETROS TP
     public static double TOL = pow(10, -35);
     public static int tamMatriz;
-    public static int maxTamMatriz = 10;
+    public static int maxTamMatriz = 150;
     public static int tamGS;
-    public static int maxTamGS = 10;
+    public static int maxTamGS = 150;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -52,6 +56,9 @@ public class TP {
         arregloResiduos = new double[3][maxTamMatriz];
 
         //EJERCICIO 1
+        System.out.println("EJERCICIO 1");
+        System.out.println("==================================");
+
         //a)
         puntoA();
 
@@ -60,79 +67,57 @@ public class TP {
 
         //EJERCICIO 2
         //Estructuras for para ir guardando las normas del error para graficar despues)
+        double residuoMax = 0;
+        float residuoMax2 = 0;
         for (tamMatriz = 1; tamMatriz <= maxTamMatriz; tamMatriz++) {
 
             //a)
             make_sys((int) tamMatriz);
 
-            //Imprimir matriz de entrada
-            if (mostrarMatrizA) {
-                System.out.println("\nMatriz A: ");
-                for (int i = 0; i < M.length; i++) {
-                    for (int j = 0; j < M.length; j++) {
-                        System.out.print(" " + M[i][j]);
-                    }
-                    System.out.print(" | " + B[i]);
-                    System.out.println("");
-                }
-            }
-
             //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
-            double[] solucion;
-            solucion = ge.solve(M, B);
-            double[] residuo = solucion;
-            double residuoMax = 0;
-            for (int i = 0; i < solucion.length; i++) {
-                residuo[i] = ((producto2(M, solucion))[i] - B[i]);
+            solucionB = ge.solve(M, B);
+            double[] residuo = solucionB;
+            residuoMax = 0;
+            for (int i = 0; i < solucionB.length; i++) {
+                residuo[i] = ((producto2(M, solucionB))[i] - B[i]);
                 if (residuo[i] > residuoMax) {
                     residuoMax = residuo[i];
                 }
             }
             if (residuoMax == 0) {
-                arregloResiduos[0][tamMatriz - 1] = -35 + Math.random() * 0.5;
+                arregloResiduos[0][tamMatriz - 1] = -15.5 + Math.random() * 0.5;
             } else {
-                arregloResiduos[0][tamMatriz - 1] = log(residuoMax);
+                arregloResiduos[0][tamMatriz - 1] = (log(residuoMax)) / (log(10));
             }
-            System.out.println("\nNorma del residuo : 10^" + log(residuoMax));
-            System.out.println();
 
             //c)
             make_sys2((int) tamMatriz);
-            float[] solucion2;
-            float residuoMax2 = 0;
-            solucion2 = ge.solve2(M2, B2);
-            float[] residuo2 = solucion2;
-            for (int i = 0; i < solucion2.length; i++) {
-                residuo2[i] = (float) ((producto3(M2, solucion2))[i] - B2[i]);
+            residuoMax2 = 0;
+            solucionC = ge.solve2(M2, B2);
+            float[] residuo2 = solucionC;
+            for (int i = 0; i < solucionC.length; i++) {
+                residuo2[i] = (float) ((producto3(M2, solucionC))[i] - B2[i]);
                 if (residuo2[i] > residuoMax2) {
                     residuoMax2 = residuo2[i];
                 }
             }
             if (residuoMax2 == 0) {
-                arregloResiduos[1][tamMatriz - 1] = -15 + Math.random() * 0.25;
+                arregloResiduos[1][tamMatriz - 1] = -7 + Math.random() * 0.25;
             } else {
-                arregloResiduos[1][tamMatriz - 1] = log(residuoMax2);
+                arregloResiduos[1][tamMatriz - 1] = (log(residuoMax2)) / (log(10));
             }
 
-            System.out.println("\nNorma del residuo : 10^" + log(residuoMax2));
-            System.out.println();
         }
-
+        double[] solGS = null;
+        double residuoMax3 = 0;
         for (tamGS = 1; tamGS <= maxTamGS; tamGS++) {
             //d)
             make_sys(tamGS);
-            //double[][] me = {{3, 1, 1}, {1, 3, 1}, {2, 1, 4}};
-            //double[] dea = {4, 3, 2};
-
             double[] x = B;
-
-            //for (int i = 0; i < 3; i++) {
-            //    x[i] = 1;
-            //}
-            double[] solGS = gauss_seidel(M, B, x);
+            solGS = gauss_seidel(M, B, x);
 
             double[] residuo3 = solGS;
-            double residuoMax3 = 0;
+            residuoMax3 = 0;
             for (int i = 0; i < solGS.length; i++) {
                 residuo3[i] = ((producto2(M, solGS))[i] - B[i]);
                 if (residuo3[i] > residuoMax3) {
@@ -140,20 +125,60 @@ public class TP {
                 }
             }
             if (residuoMax3 == 0) {
-                arregloResiduos[2][tamGS - 1] = -35 + Math.random() * 0.5;
+                arregloResiduos[2][tamGS - 1] = -15.5 + Math.random() * 0.5;
             } else {
-                arregloResiduos[2][tamGS - 1] = log(residuoMax3);
+                arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
         }
 
-        System.out.println("=======Punto d)=========");
+        //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
+        solucionB = ge.solve(M, B);
+        solucionC = ge.solve2(M2, B2);
+        //TERMINO LA ULTIMA ITERACION
+
+        System.out.println("EJERCICIO 2");
+        System.out.println("==================================");
+
+        //Imprimir matriz de entrada
+        if (mostrarMatrizA) {
+            System.out.println("\nMatriz A generada: ");
+            for (int i = 0; i < M.length; i++) {
+                for (int j = 0; j < M.length; j++) {
+                    System.out.print(" " + M[i][j]);
+                }
+                System.out.print(" | " + B[i]);
+                System.out.println("");
+            }
+        }
+        System.out.println("=============Punto b)=============");
+        System.out.println("Iteraciones: " + iteracionesB);
+        if (mostrarError) {
+            System.out.println("Error: " + mayorAux);
+        }
+        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax)) / (log(10)));
+        printSolution(solucionB);
+        System.out.println("==================================");
+        
+        System.out.println("=============Punto c)=============");
+        System.out.println("Iteraciones: " + iteracionesC);
+        if (mostrarError) {
+            System.out.println("Error: " + mayorAux);
+        }
+        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax2)) / (log(10)));
+        printSolution(solucionB);
+        System.out.println("==================================");
+
+        System.out.println("=============Punto d)=============");
         System.out.println("Tolerancia: 10^" + (log(TOL) / log(10)));
         System.out.println("Iteraciones: " + iteracionesD);
-        System.out.println("Error: " + mayorAux);
-        for (int j = 0; j < c.length; j++) {
-            System.out.println("Var" + j + "= " + Res[j]);
+        if (mostrarError) {
+            System.out.println("Error: " + mayorAux);
         }
-        System.out.println("================================");
+        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax3)) / (log(10)));
+        for (int j = 0; j < c.length; j++) {
+            System.out.println("Var" + j + "= " + solGS[j]);
+        }
+        System.out.println("==================================");
 
         //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
@@ -386,7 +411,7 @@ con los términos diagonales.
             }
             ultimaIter = i;
         }
-        System.out.println("=======Punto b)=========");
+        System.out.println("=============Punto b)=============");
         System.out.println("Tolerancia: 10^" + (log(TOL)) / log(10));
         System.out.println("Iteraciones: " + ultimaIter);
         if (mostrarError) {
@@ -395,7 +420,7 @@ con los términos diagonales.
         System.out.println("x = " + x.get(ultimaIter));
         System.out.println("y = " + y.get(ultimaIter));
         System.out.println("z = " + z.get(ultimaIter));
-        System.out.println("================================");
+        System.out.println("==================================");
     }
 
     public static void puntoA() {
@@ -452,7 +477,7 @@ con los términos diagonales.
             }
             ultimaIter = i;
         }
-        System.out.println("=======Punto a)=========");
+        System.out.println("=============Punto a)=============");
         System.out.println("Tolerancia: 10^" + (log(TOL)) / log(10));
         System.out.println("Iteraciones: " + ultimaIter);
         if (mostrarError) {
@@ -461,7 +486,7 @@ con los términos diagonales.
         System.out.println("x = " + x.get(ultimaIter));
         System.out.println("y = " + y.get(ultimaIter));
         System.out.println("z = " + z.get(ultimaIter));
-        System.out.println("================================");
+        System.out.println("==================================");
     }
 
     public static double[] gauss_seidel(double[][] m, double[] b, double[] sol) {
@@ -475,16 +500,31 @@ con los términos diagonales.
             }
         }
 
+        double[][] M;
         Matrix auxMatriz;
         double[] vecAux;
-        Res = new double[b.length];
+        double[] Res = new double[b.length];
         double[] Aux = new double[b.length];
         double[] anterior = new double[b.length];
         boolean bandera = true;
 
         // x^(k+1)=M*x^(k)+c
         //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
-        
+        //Se verifica si es diagonal dominante
+        for (int i = 0; i < b.length; i++) {
+            for (int j = 0; j < b.length; j++) {
+                if (i != j) {
+                    aux += abs(m[i][j]);
+                }
+            }
+            if (abs(m[i][i]) <= aux) {
+                //System.out.println("NO ES MATRIZ DOMINANTE");
+                bandera = false;
+                break;
+            }
+            aux = 0;
+        }
+
         if (bandera) {
             //Matriz N
             for (int i = 0; i < b.length; i++) {
@@ -526,25 +566,45 @@ con los términos diagonales.
                 for (int d = 0; d < Res.length; d++) {
                     Aux[d] = abs((double) Res[d] - (double) anterior[d]);
                     mayores.add(Aux[d]);
-                    iteracionesD = i + 1;
                 }
 
-                mayorAux = (double) Collections.max(mayores);
-
+                mayor = (double) Collections.max(mayores);
                 if (mayor <= TOL || i >= maxIteraciones) {
                     break;
                 }
 
                 vecAux = producto(M, Aux);
 
-                System.arraycopy(Res, 0, anterior, 0, vecAux.length);
+                for (int w = 0; w < vecAux.length; w++) {
+                    anterior[w] = Res[w];
+
+                }
 
                 for (int k = 0; k < c.length; k++) {
                     Res[k] = vecAux[k] + c[k];
                 }
+                iteracionesD = i;
             }
         }
         return Res;
+    }
+
+    public static void printSolution(double[] sol) {
+        int N = sol.length;
+        System.out.println("\nSolución : ");
+        for (int i = 0; i < N; i++) {
+            System.out.printf("%.3f ", sol[i]);
+        }
+        System.out.println();
+    }
+
+    public static void printSolution2(float[] sol) {
+        int N = sol.length;
+        System.out.println("\nSolución : ");
+        for (int i = 0; i < N; i++) {
+            System.out.printf("%.3f ", sol[i]);
+        }
+        System.out.println();
     }
 
 }
