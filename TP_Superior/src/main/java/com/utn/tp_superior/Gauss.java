@@ -73,9 +73,7 @@ public class Gauss extends TP {
         /**
          * Print solution *
          */
-        if (imprimirSolucion) {
-            printSolution(solution);
-        }
+        if(imprimirSolucion)printSolution(solution);
 
         return solution;
     }
@@ -141,9 +139,8 @@ public class Gauss extends TP {
         /**
          * Print solution *
          */
-        if (imprimirSolucion) {
-            printSolution2(solution);
-        }
+        if (imprimirSolucion) printSolution2(solution);
+ 
         return solution;
     }
 

@@ -27,12 +27,14 @@ public class TP {
     static Gauss ge = new Gauss();
     public static double arregloResiduos[][] = null;
     public static int ultimaIter;
+    public static int ultimaIteracionGradiente;
     public static double mayorAux;
     public static int e = 0;
     public static double[] Res;
     public static int iteracionesB;
     public static int iteracionesC;
     public static int iteracionesD;
+    public static double[] resultadoGradiente = null;
     public static double[] c;
     public static double[] solucionB = null;
     public static float[] solucionC = null;
@@ -40,9 +42,9 @@ public class TP {
     //PARAMETROS TP
     public static double TOL = pow(10, -35);
     public static int tamMatriz;
-    public static int maxTamMatriz = 150;
+    public static int maxTamMatriz = 15;
     public static int tamGS;
-    public static int maxTamGS = 150;
+    public static int maxTamGS = 15;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -113,10 +115,10 @@ public class TP {
         for (tamGS = 1; tamGS <= maxTamGS; tamGS++) {
             //d)
             make_sys(tamGS);
-            double[] x = B;
+            double[] x = B.clone();
             solGS = gauss_seidel(M, B, x);
 
-            double[] residuo3 = solGS;
+            double[] residuo3 = solGS.clone();
             residuoMax3 = 0;
             for (int i = 0; i < solGS.length; i++) {
                 residuo3[i] = ((producto2(M, solGS))[i] - B[i]);
@@ -129,11 +131,30 @@ public class TP {
             } else {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
+            
+            //ULTIMO PUNTO 
+            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+            
+            gradienteConjugado(M, B, B, TOL, maxIteraciones);
+            //System.out.println("Gradiente Conjugado");
+            for (int i = 0; i < resultadoGradiente.length; i++) {
+                //System.out.println(resultadoGradiente[i]);
+            }
+            
+            //System.out.println(ultimaIteracionGradiente);
+            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+            
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
         solucionB = ge.solve(M, B);
         solucionC = ge.solve2(M2, B2);
+        
+        //TERMINO LA ULTIMA ITERACION
+        //TERMINO LA ULTIMA ITERACION
         //TERMINO LA ULTIMA ITERACION
 
         System.out.println("EJERCICIO 2");
@@ -155,17 +176,17 @@ public class TP {
         if (mostrarError) {
             System.out.println("Error: " + mayorAux);
         }
-        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax)) / (log(10)));
+        System.out.println("Norma del residuo : 10^" + (log(residuoMax)) / (log(10)));
         printSolution(solucionB);
         System.out.println("==================================");
-        
+
         System.out.println("=============Punto c)=============");
         System.out.println("Iteraciones: " + iteracionesC);
         if (mostrarError) {
             System.out.println("Error: " + mayorAux);
         }
-        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax2)) / (log(10)));
-        printSolution(solucionB);
+        System.out.println("Norma del residuo : 10^" + (log(residuoMax2)) / (log(10)));
+        printSolution2(solucionC);
         System.out.println("==================================");
 
         System.out.println("=============Punto d)=============");
@@ -174,7 +195,7 @@ public class TP {
         if (mostrarError) {
             System.out.println("Error: " + mayorAux);
         }
-        System.out.println("\nNorma del residuo : 10^" + (log(residuoMax3)) / (log(10)));
+        System.out.println("Norma del residuo : 10^" + (log(residuoMax3)) / (log(10)));
         for (int j = 0; j < c.length; j++) {
             System.out.println("Var" + j + "= " + solGS[j]);
         }
@@ -499,8 +520,6 @@ con los términos diagonales.
                 p[i][j] = m[i][j];
             }
         }
-
-        double[][] M;
         Matrix auxMatriz;
         double[] vecAux;
         double[] Res = new double[b.length];
@@ -591,7 +610,7 @@ con los términos diagonales.
 
     public static void printSolution(double[] sol) {
         int N = sol.length;
-        System.out.println("\nSolución : ");
+        System.out.println("Solución : ");
         for (int i = 0; i < N; i++) {
             System.out.printf("%.3f ", sol[i]);
         }
@@ -600,11 +619,63 @@ con los términos diagonales.
 
     public static void printSolution2(float[] sol) {
         int N = sol.length;
-        System.out.println("\nSolución : ");
+        System.out.println("Solución : ");
         for (int i = 0; i < N; i++) {
             System.out.printf("%.3f ", sol[i]);
         }
         System.out.println();
     }
 
+    public static void gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max) {
+
+        //Fuente http://esfm.egormaximenko.com/numlinalg/conjugate_gradient_method_theory_es.pdf 
+        double[] x, aux;
+        x = x0.clone();
+        double[] r = new double[b.length];
+        double[] p, q;
+        double rr = 0, s = 0, la, rrold, be, aux2 = 0, aux3 = 0;
+
+        aux = producto(A, x);
+
+        for (int i = 0; i < b.length; i++) {
+            r[i] = b[i] - aux[i];
+        }
+        p = r;
+        for (int i = 0; i < r.length; i++) {
+            rr += r[i] * r[i];
+        }
+        while (s < max && rr >= TOL) {
+            q = producto(A, p);
+            for (int i = 0; i < q.length; i++) {
+                aux2 += p[i] * r[i];
+            }
+
+            for (int i = 0; i < q.length; i++) {
+                aux3 += p[i] * q[i];
+            }
+
+            la = aux2 / aux3;
+            aux2 = aux3 = 0;
+            for (int i = 0; i < x.length; i++) {
+                x[i] = x[i] + (la * p[i]);
+                r[i] = r[i] - (la * q[i]);
+            }
+
+            rrold = rr;
+
+            for (int i = 0; i < r.length; i++) {
+                rr += r[i] * r[i];
+            }
+
+            be = -rr / rrold;
+
+            for (int i = 0; i < p.length; i++) {
+                p[i] = r[i] - (be * p[i]);
+            }
+            s++;
+        }
+
+        resultadoGradiente = x;
+        ultimaIteracionGradiente = (int) s;
+    }
 }
