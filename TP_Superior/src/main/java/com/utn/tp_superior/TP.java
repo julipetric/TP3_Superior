@@ -19,7 +19,7 @@ import org.apache.commons.lang3.time.StopWatch;
 public class TP {
 
     //VARIABLES GLOBALES
-    public static int maxIteraciones = 1000;
+    public static int maxIteraciones = 10000000;
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
@@ -132,6 +132,7 @@ public class TP {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
 
+
             //ULTIMO PUNTO 
             //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
             //ULTIMO PUNTO 
@@ -145,6 +146,7 @@ public class TP {
             //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
             //ULTIMO PUNTO 
             //ULTIMO PUNTO 
+
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
@@ -207,6 +209,25 @@ public class TP {
             example.setVisible(true);
         });
 
+        
+            //ULTIMO PUNTO 
+            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+            
+            gradienteConjugado(M, B, B.clone(),TOL,maxIteraciones);
+            //System.out.println("Gradiente Conjugado");
+            for (int i = 0; i < resultadoGradiente.length; i++) {
+                System.out.println(resultadoGradiente[i]);
+            }
+            
+            System.out.println(ultimaIteracionGradiente);
+            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+            //ULTIMO PUNTO 
+        
+        
+        
+        
     }
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
 
@@ -557,24 +578,25 @@ con los términos diagonales.
         System.out.println();
     }
 
-    public static void gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max) {
+    /*public static void gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max) {
 
         //Fuente http://esfm.egormaximenko.com/numlinalg/conjugate_gradient_method_theory_es.pdf 
         double[] x, aux;
         x = x0.clone();
         double[] r = new double[b.length];
         double[] p, q;
-        double rr = 0, s = 0, la, rrold, be, aux2 = 0, aux3 = 0;
+        double rr = 0, s = 0, la=0, rrold=0, be=0, aux2 = 0, aux3 = 0;
 
         aux = producto(A, x);
 
         for (int i = 0; i < b.length; i++) {
             r[i] = b[i] - aux[i];
         }
-        p = r;
+        p = r.clone();
         for (int i = 0; i < r.length; i++) {
             rr += r[i] * r[i];
         }
+      
         while (s < max && rr >= TOL) {
             q = producto(A, p);
             for (int i = 0; i < q.length; i++) {
@@ -595,18 +617,68 @@ con los términos diagonales.
             rrold = rr;
 
             for (int i = 0; i < r.length; i++) {
-                rr += r[i] * r[i];
+                aux3 += r[i] * r[i];
             }
-
-            be = -rr / rrold;
+            rr=aux3;
+            aux3=0;
+            be = -1*rr / rrold;
 
             for (int i = 0; i < p.length; i++) {
                 p[i] = r[i] - (be * p[i]);
             }
             s++;
+           
         }
 
         resultadoGradiente = x;
         ultimaIteracionGradiente = (int) s;
+        System.out.println("Tolerancia del metodo: "+rr+" Tolerancia mia: "+TOL);
+    }*/
+    
+    public static void gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max){
+    int k =0;
+    double[]w,x  = b.clone(),aux,r = new double[b.length],p=new double[b.length];
+    double rr=0,s=0,beta=1,rrviejo=1,aux1=0,alpha;
+     aux = producto(A, x);
+        for (int i = 0; i < b.length; i++) {
+            r[i] = b[i] - aux[i];
+        }
+        for (int i = 0; i < r.length; i++) {
+            rr += r[i] * r[i];
+        }
+    
+        while(Math.sqrt(rr)>TOL && s<max){
+            s++;
+            if (s==1) {
+            p=r.clone();
+            }else{
+            beta=rr/rrviejo;
+                for (int i = 0; i < p.length; i++) {
+                  p[i]=r[i]+(beta*p[i]);  
+                }
+            }
+            w = producto(A,p);
+            for (int i = 0; i < w.length; i++) {
+                aux1+=p[i]*w[i];
+            }
+            alpha=beta/aux1;
+            aux1=0;
+            for (int i = 0; i < x.length; i++) {
+                x[i] = x[i] + (alpha * p[i]);
+                r[i] = r[i] - (alpha * w[i]);
+            }
+            rrviejo=rr;
+            rr=0;
+            for (int i = 0; i < r.length; i++) {
+            rr += r[i] * r[i];
+            } 
+        } 
+        resultadoGradiente = x;
+        ultimaIteracionGradiente = (int) s;
+        System.out.println("Tolerancia del metodo: "+rr+" Tolerancia mia: "+TOL);
+      
     }
-}
+
+}   
+
+
