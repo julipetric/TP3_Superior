@@ -196,7 +196,7 @@ public class TP {
             System.out.println("Error: " + mayorAux);
         }
         System.out.println("Norma del residuo : 10^" + (log(residuoMax3)) / (log(10)));
-        for (int j = 0; j < c.length; j++) {
+        for (int j = 0; j < solGS.length; j++) {
             System.out.println("Var" + j + "= " + solGS[j]);
         }
         System.out.println("==================================");
