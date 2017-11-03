@@ -19,7 +19,7 @@ import org.apache.commons.lang3.time.StopWatch;
 public class TP {
 
     //VARIABLES GLOBALES
-    public static int maxIteraciones = 10000000;
+    public static int maxIteraciones = 1000000;
     public static double M[][];
     public static double[] B = null;
     public static float M2[][];
@@ -131,22 +131,6 @@ public class TP {
             } else {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
-
-
-            //ULTIMO PUNTO 
-            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
-            //ULTIMO PUNTO 
-            gradienteConjugado(M, B, B, TOL, maxIteraciones);
-            //System.out.println("Gradiente Conjugado");
-            for (int i = 0; i < resultadoGradiente.length; i++) {
-                //System.out.println(resultadoGradiente[i]);
-            }
-
-            //System.out.println(ultimaIteracionGradiente);
-            //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
-            //ULTIMO PUNTO 
-            //ULTIMO PUNTO 
-
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
@@ -223,11 +207,7 @@ public class TP {
             System.out.println(ultimaIteracionGradiente);
             //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
             //ULTIMO PUNTO 
-            //ULTIMO PUNTO 
-        
-        
-        
-        
+            //ULTIMO PUNTO    
     }
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
 
