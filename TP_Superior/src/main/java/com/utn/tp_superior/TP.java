@@ -42,9 +42,9 @@ public class TP {
     //PARAMETROS TP
     public static double TOL = pow(10, -35);
     public static int tamMatriz;
-    public static int maxTamMatriz = 15;
+    public static int maxTamMatriz = 30;
     public static int tamGS;
-    public static int maxTamGS = 15;
+    public static int maxTamGS = 30;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -116,7 +116,7 @@ public class TP {
             //d)
             make_sys(tamGS);
             double[] x = B.clone();
-            solGS = gauss_seidel(M, B, x);
+            solGS = gauss_seidel(M.clone(), B.clone(), x);
 
             double[] residuo3 = solGS.clone();
             residuoMax3 = 0;
@@ -131,32 +131,29 @@ public class TP {
             } else {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
-            
+
             //ULTIMO PUNTO 
             //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
             //ULTIMO PUNTO 
-            
             gradienteConjugado(M, B, B, TOL, maxIteraciones);
             //System.out.println("Gradiente Conjugado");
             for (int i = 0; i < resultadoGradiente.length; i++) {
                 //System.out.println(resultadoGradiente[i]);
             }
-            
+
             //System.out.println(ultimaIteracionGradiente);
             //ULTIMO PUNTO//ULTIMO PUNTO//ULTIMO PUNTO 
             //ULTIMO PUNTO 
             //ULTIMO PUNTO 
-            
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
         solucionB = ge.solve(M, B);
         solucionC = ge.solve2(M2, B2);
-        
-        //TERMINO LA ULTIMA ITERACION
-        //TERMINO LA ULTIMA ITERACION
-        //TERMINO LA ULTIMA ITERACION
 
+        //TERMINO LA ULTIMA ITERACION
+        //TERMINO LA ULTIMA ITERACION
+        //TERMINO LA ULTIMA ITERACION
         System.out.println("EJERCICIO 2");
         System.out.println("==================================");
 
@@ -512,100 +509,34 @@ con los términos diagonales.
 
     public static double[] gauss_seidel(double[][] m, double[] b, double[] sol) {
 
-        double aux = 0;
-        double[][] p = new double[b.length][b.length];
-
-        for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                p[i][j] = m[i][j];
-            }
-        }
-        Matrix auxMatriz;
-        double[] vecAux;
-        double[] Res = new double[b.length];
-        double[] Aux = new double[b.length];
-        double[] anterior = new double[b.length];
+        iteracionesD = 0;
+        double[] anterior = sol.clone();
         boolean bandera = true;
-
-        // x^(k+1)=M*x^(k)+c
-        //FUENTE https://es.wikipedia.org/wiki/M%C3%A9todo_de_Gauss-Seidel
-        //Se verifica si es diagonal dominante
-        for (int i = 0; i < b.length; i++) {
-            for (int j = 0; j < b.length; j++) {
-                if (i != j) {
-                    aux += abs(m[i][j]);
+        while (bandera) {
+            for (int i = 0; i < tamGS; i++) {
+                double a = 0;
+                for (int j = 0; j < tamGS; j++) {
+                    if (j != i) {
+                        a = a + m[i][j] * sol[j];
+                    }
                 }
+                sol[i] = (b[i] - a) / m[i][i];
             }
-            if (abs(m[i][i]) <= aux) {
-                //System.out.println("NO ES MATRIZ DOMINANTE");
+            iteracionesD++;
+            ArrayList<Double> errores = new ArrayList<>();
+            for (int i = 0; i < sol.length; i++) {
+                errores.add(abs(sol[i] - anterior[i]));
+            }
+            double errorMax = Collections.max(errores);
+            if (errorMax <= TOL) {
                 bandera = false;
-                break;
             }
-            aux = 0;
+            if (iteracionesD >= maxIteraciones) {
+                bandera = false;
+            }
+            anterior = sol.clone();
         }
-
-        if (bandera) {
-            //Matriz N
-            for (int i = 0; i < b.length; i++) {
-                for (int j = 0; j < b.length; j++) {
-                    if (i < j) {
-                        m[i][j] = 0;
-                    }
-                }
-            }
-            //Matriz N^-1
-            auxMatriz = new Matrix(m);
-            auxMatriz = Matrix.inverse(auxMatriz);
-            //Matriz P
-            for (int i = 0; i < b.length; i++) {
-                for (int j = 0; j < b.length; j++) {
-                    if (i >= j) {
-                        p[i][j] = 0;
-                    }
-                }
-            }
-
-            //Matriz M
-            M = producto(auxMatriz, p);
-            //Vector c
-            c = producto(auxMatriz, b);
-            //Primera aproximacion
-            vecAux = producto(M, sol);
-
-            for (int i = 0; i < c.length; i++) {
-                Res[i] = vecAux[i] + c[i];
-            }
-            for (int i = 0; i < c.length; i++) {
-                anterior[i] = 0;
-            }
-            ArrayList mayores = new ArrayList();
-            for (int i = 0; i < maxIteraciones; i++) {
-                double mayor = 0;
-                mayores.clear();
-                for (int d = 0; d < Res.length; d++) {
-                    Aux[d] = abs((double) Res[d] - (double) anterior[d]);
-                    mayores.add(Aux[d]);
-                }
-
-                mayor = (double) Collections.max(mayores);
-                if (mayor <= TOL || i >= maxIteraciones) {
-                    break;
-                }
-
-                vecAux = producto(M, Aux);
-
-                for (int w = 0; w < vecAux.length; w++) {
-                    anterior[w] = Res[w];
-
-                }
-
-                for (int k = 0; k < c.length; k++) {
-                    Res[k] = vecAux[k] + c[k];
-                }
-                iteracionesD = i;
-            }
-        }
-        return Res;
+        return sol;
     }
 
     public static void printSolution(double[] sol) {
