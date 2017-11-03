@@ -40,11 +40,11 @@ public class TP {
     public static float[] solucionC = null;
 
     //PARAMETROS TP
-    public static double TOL = pow(10, -35);
+    public static double TOL = pow(10, -14);
     public static int tamMatriz;
-    public static int maxTamMatriz = 30;
+    public static int maxTamMatriz = 5;
     public static int tamGS;
-    public static int maxTamGS = 30;
+    public static int maxTamGS = 5;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -94,7 +94,6 @@ public class TP {
 
             //c)
             make_sys2((int) tamMatriz);
-            residuoMax2 = 0;
             solucionC = ge.solve2(M2, B2);
             float[] residuo2 = solucionC;
             for (int i = 0; i < solucionC.length; i++) {
@@ -119,7 +118,6 @@ public class TP {
             solGS = gauss_seidel(M.clone(), B.clone(), x);
 
             double[] residuo3 = solGS.clone();
-            residuoMax3 = 0;
             for (int i = 0; i < solGS.length; i++) {
                 residuo3[i] = ((producto2(M, solGS))[i] - B[i]);
                 if (residuo3[i] > residuoMax3) {
@@ -160,7 +158,9 @@ public class TP {
             System.out.println("Error: " + mayorAux);
         }
         System.out.println("Norma del residuo : 10^" + (log(residuoMax)) / (log(10)));
-        printSolution(solucionB);
+        for (int j = 0; j < solucionB.length; j++) {
+            System.out.println("Var" + j + "= " + solucionB[j]);
+        }
         System.out.println("==================================");
 
         System.out.println("=============Punto c)=============");
@@ -169,7 +169,9 @@ public class TP {
             System.out.println("Error: " + mayorAux);
         }
         System.out.println("Norma del residuo : 10^" + (log(residuoMax2)) / (log(10)));
-        printSolution2(solucionC);
+        for (int j = 0; j < solucionC.length; j++) {
+            System.out.println("Var" + j + "= " + solucionC[j]);
+        }
         System.out.println("==================================");
 
         System.out.println("=============Punto d)=============");
@@ -187,7 +189,7 @@ public class TP {
         //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
             Scatter example = new Scatter("Comparación norma errores", arregloResiduos);
-            example.setSize(2000, 1000);
+            example.setSize(800, 400);
             example.setLocationRelativeTo(null);
             example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             example.setVisible(true);
@@ -424,7 +426,6 @@ con los términos diagonales.
 
             if (mayorAux <= TOL || i >= maxIteraciones) {
                 tiempoJ.stop();
-                System.out.println("Tiempo transcurrido por metodo de Jacobi: " + tiempoJ.toString() + " ms");
                 break;
             }
             ultimaIter = i;
@@ -438,6 +439,7 @@ con los términos diagonales.
         System.out.println("x = " + x.get(ultimaIter));
         System.out.println("y = " + y.get(ultimaIter));
         System.out.println("z = " + z.get(ultimaIter));
+        System.out.println("Tiempo transcurrido por metodo de Jacobi: " + tiempoJ.toString() + " ms");
         System.out.println("==================================");
     }
 
@@ -490,7 +492,6 @@ con los términos diagonales.
             mayorAux = (double) Collections.max(mayores);
             if (mayorAux <= TOL || i >= maxIteraciones) {
                 tiempoN.stop();
-                System.out.println("Tiempo transcurrido por metodo de Newton: " + tiempoN.toString() + " ms");
                 break;
             }
             ultimaIter = i;
@@ -504,6 +505,7 @@ con los términos diagonales.
         System.out.println("x = " + x.get(ultimaIter));
         System.out.println("y = " + y.get(ultimaIter));
         System.out.println("z = " + z.get(ultimaIter));
+        System.out.println("Tiempo transcurrido por metodo de Newton: " + tiempoN.toString() + " ms");
         System.out.println("==================================");
     }
 
