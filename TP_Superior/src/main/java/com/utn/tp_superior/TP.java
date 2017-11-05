@@ -26,6 +26,7 @@ public class TP {
     public static float[] B2 = null;
     static Gauss ge = new Gauss();
     public static double arregloResiduos[][] = null;
+    public static double[][] arregloResiduosTiempo = null;
     public static int ultimaIter;
     public static int ultimaIteracionGradiente;
     public static double mayorAux;
@@ -37,14 +38,15 @@ public class TP {
     public static double[] resultadoGradiente = null;
     public static double[] c;
     public static double[] solucionB = null;
+    public static double[] solucionF = null;
     public static float[] solucionC = null;
 
     //PARAMETROS TP
     public static double TOL = pow(10, -14);
     public static int tamMatriz;
-    public static int maxTamMatriz = 5;
+    public static int maxTamMatriz = 20;
     public static int tamGS;
-    public static int maxTamGS = 5;
+    public static int maxTamGS = 20;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -55,7 +57,8 @@ public class TP {
 
     public static void main(String[] args) {
 
-        arregloResiduos = new double[3][maxTamMatriz];
+        arregloResiduos = new double[4][maxTamMatriz];
+        arregloResiduosTiempo = new double[3][maxTamMatriz];
 
         //EJERCICIO 1
         System.out.println("EJERCICIO 1");
@@ -77,6 +80,9 @@ public class TP {
             make_sys((int) tamMatriz);
 
             //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
+            StopWatch tiempoB = new StopWatch();
+            tiempoB.reset();
+            tiempoB.start();
             solucionB = ge.solve(M, B);
             double[] residuo = solucionB;
             residuoMax = 0;
@@ -91,6 +97,8 @@ public class TP {
             } else {
                 arregloResiduos[0][tamMatriz - 1] = (log(residuoMax)) / (log(10));
             }
+            tiempoB.stop();
+            arregloResiduosTiempo[0][tamMatriz - 1] = tiempoB.getTime();
 
             //c)
             make_sys2((int) tamMatriz);
@@ -108,11 +116,43 @@ public class TP {
                 arregloResiduos[1][tamMatriz - 1] = (log(residuoMax2)) / (log(10));
             }
 
+            //f)
+            StopWatch tiempoF = new StopWatch();
+            tiempoF.reset();
+            tiempoF.start();
+            solucionF = gradienteConjugado(M, B, B.clone()/*valores iniciales*/, TOL, maxIteraciones);
+            tiempoF.stop();
+            double[] residuoF = solucionF;
+            residuoMax = 0;
+            for (int i = 0; i < solucionF.length; i++) {
+                residuoF[i] = ((producto2(M, solucionF))[i] - B[i]);
+                if (residuoF[i] > residuoMax) {
+                    residuoMax = residuoF[i];
+                }
+                if (residuoMax == 0) {
+                    arregloResiduos[3][tamMatriz - 1] = -15.5 + Math.random() * 0.5;
+                } else {
+                    arregloResiduos[3][tamMatriz - 1] = (log(residuoMax)) / (log(10));
+                }
+            }
+            arregloResiduosTiempo[2][tamMatriz-1] = tiempoF.getTime();
+            //System.out.println("Gradiente Conjugado");
+            /*
+            for (int i = 0; i < resultadoGradiente.length; i++) {
+                System.out.println(resultadoGradiente[i]);
+            }
+            
+            System.out.println(ultimaIteracionGradiente);
+             */
         }
+
         double[] solGS = null;
         double residuoMax3 = 0;
         for (tamGS = 1; tamGS <= maxTamGS; tamGS++) {
             //d)
+            StopWatch tiempoD = new StopWatch();
+            tiempoD.reset();
+            tiempoD.start();
             make_sys(tamGS);
             double[] x = B.clone();
             solGS = gauss_seidel(M.clone(), B.clone(), x);
@@ -124,11 +164,13 @@ public class TP {
                     residuoMax3 = residuo3[i];
                 }
             }
+            tiempoD.stop();
             if (residuoMax3 == 0) {
                 arregloResiduos[2][tamGS - 1] = -15.5 + Math.random() * 0.5;
             } else {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
+            arregloResiduosTiempo[1][tamGS - 1] = tiempoD.getTime();
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
@@ -195,20 +237,14 @@ public class TP {
             example.setVisible(true);
         });
 
-        
-          
-            //f =====================================fffff========================= f 
-            make_sys((int) 10000);
-            
-            gradienteConjugado(M,B,B.clone()/*valores iniciales*/,TOL,maxIteraciones);
-            //System.out.println("Gradiente Conjugado");
-            for (int i = 0; i < resultadoGradiente.length; i++) {
-                System.out.println(resultadoGradiente[i]);
-            }
-            
-            System.out.println(ultimaIteracionGradiente);
-            
-            
+        SwingUtilities.invokeLater(() -> {
+            Scatter example = new Scatter("Comparación norma errores en función del tiempo de cálculo", arregloResiduos, arregloResiduosTiempo);
+            example.setSize(800, 400);
+            example.setLocationRelativeTo(null);
+            example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            example.setVisible(true);
+        });
+
     }
     //Funcion para crear la matriz segun especificación del enunciado dado un tamaño
 
@@ -559,17 +595,17 @@ con los términos diagonales.
         System.out.println();
     }
 
-    public static void gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max) {
+    public static double[] gradienteConjugado(double[][] A, double[] b, double[] x0, double TOL, int max) {
 
         //Fuente http://esfm.egormaximenko.com/numlinalg/conjugate_gradient_method_theory_es.pdf 
         double[] x, aux;
         x = x0.clone();
         double[] r = new double[b.length];
         double[] p, q;
-        double rr = 0, s = 0, la=0, rrold=0, be=0, aux2 = 0, aux3 = 0;
+        double rr = 0, s = 0, la = 0, rrold = 0, be = 0, aux2 = 0, aux3 = 0;
 
         aux = producto(A, x);
-        
+
         for (int i = 0; i < b.length; i++) {
             r[i] = b[i] - aux[i];
         }
@@ -599,9 +635,9 @@ con los términos diagonales.
             for (int i = 0; i < r.length; i++) {
                 aux3 += r[i] * r[i];
             }
-            rr=aux3;
-            aux3=0;
-            be = -1*rr / rrold;
+            rr = aux3;
+            aux3 = 0;
+            be = -1 * rr / rrold;
 
             for (int i = 0; i < p.length; i++) {
                 p[i] = r[i] - (be * p[i]);
@@ -610,8 +646,7 @@ con los términos diagonales.
         }
         resultadoGradiente = x;
         ultimaIteracionGradiente = (int) s;
-        System.out.println("Tolerancia del metodo: "+rr+" Tolerancia mia: "+TOL);
+        //System.out.println("Tolerancia del metodo: " + rr + " Tolerancia mia: " + TOL);
+        return resultadoGradiente;
     }
-}   
-
-
+}

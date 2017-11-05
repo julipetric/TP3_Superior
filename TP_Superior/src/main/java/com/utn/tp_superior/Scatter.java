@@ -60,17 +60,17 @@ public class Scatter extends JFrame {
     private XYDataset createDataset(double arreglo[][]) {
         XYSeriesCollection dataset = new XYSeriesCollection();
 
-        XYSeries series1 = new XYSeries("Punto b)");
+        XYSeries series1 = new XYSeries("Gauss");
         for (int i = 0; i < arreglo[0].length; i++) {
             series1.add(arreglo[0][i], i + 1);
         }
 
-        XYSeries series2 = new XYSeries("Punto c)");
+        XYSeries series2 = new XYSeries("Gauss (simple precisión");
         for (int i = 0; i < arreglo[1].length; i++) {
             series2.add(arreglo[1][i], i + 1);
         }
         
-        XYSeries series3 = new XYSeries("Punto d)");
+        XYSeries series3 = new XYSeries("Gauss-Seidel");
         for (int i = 0; i < arreglo[2].length; i++) {
             series3.add(arreglo[2][i], i + 1);
         }
@@ -78,6 +78,58 @@ public class Scatter extends JFrame {
         dataset.addSeries(series1);
         dataset.addSeries(series2);
         dataset.addSeries(series3);
+
+        return dataset;
+    }
+    
+    public Scatter(String title, double arregloR[][], double[][] arregloT) {
+        super(title);
+
+        // Create dataset
+        XYDataset dataset = createDataset(arregloR, arregloT);
+
+        // Create chart
+        JFreeChart chart = ChartFactory.createScatterPlot(
+                "Comparación norma errores en función del tiempo de cálculo",
+                "Norma error (escala log10)",
+                "Tiempo de cálculo (ms)",
+                dataset,
+                PlotOrientation.HORIZONTAL,
+                TRUE,
+                FALSE,
+                FALSE);
+
+        //Changes background color
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setBackgroundPaint(new Color(255, 228, 196));
+        plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+
+        // Create Panel
+        ChartPanel panel = new ChartPanel(chart);
+        setContentPane(panel);
+    }
+
+    private XYDataset createDataset(double arregloR[][], double[][] arregloT) {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+
+        XYSeries series2 = new XYSeries("Gauss-Seidel");
+        for (int i = 0; i < arregloR[1].length; i++) {
+            series2.add(arregloR[2][i], arregloT[1][i]);
+        }
+        
+        XYSeries series1 = new XYSeries("Gauss");
+        for (int i = 0; i < arregloR[1].length; i++) {
+            series1.add(arregloR[0][i], arregloT[0][i]);
+        }
+        
+        XYSeries series3 = new XYSeries("Gradientes conjugados");
+        for (int i = 0; i < arregloR[3].length; i++) {
+            series3.add(arregloR[3][i], arregloT[2][i]);
+        }
+
+        dataset.addSeries(series1);
+        dataset.addSeries(series2);
+        //ataset.addSeries(series3);
 
         return dataset;
     }
