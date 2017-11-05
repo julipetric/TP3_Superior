@@ -35,14 +35,13 @@ public class TP {
     public static int iteracionesB;
     public static int iteracionesC;
     public static int iteracionesD;
-    public static double[] resultadoGradiente = null;
     public static double[] c;
     public static double[] solucionB = null;
     public static double[] solucionF = null;
     public static float[] solucionC = null;
 
     //PARAMETROS TP
-    public static double TOL = pow(10, -14);
+    public static double TOL = pow(10, -35);
     public static int tamMatriz;
     public static int maxTamMatriz = 20;
     public static int tamGS;
@@ -120,6 +119,7 @@ public class TP {
             StopWatch tiempoF = new StopWatch();
             tiempoF.reset();
             tiempoF.start();
+            make_sys((int) tamMatriz);
             solucionF = gradienteConjugado(M, B, B.clone()/*valores iniciales*/, TOL, maxIteraciones);
             tiempoF.stop();
             double[] residuoF = solucionF;
@@ -136,14 +136,10 @@ public class TP {
                 }
             }
             arregloResiduosTiempo[2][tamMatriz-1] = tiempoF.getTime();
-            //System.out.println("Gradiente Conjugado");
-            /*
-            for (int i = 0; i < resultadoGradiente.length; i++) {
-                System.out.println(resultadoGradiente[i]);
-            }
             
-            System.out.println(ultimaIteracionGradiente);
-             */
+            
+            
+            
         }
 
         double[] solGS = null;
@@ -227,7 +223,18 @@ public class TP {
             System.out.println("Var" + j + "= " + solGS[j]);
         }
         System.out.println("==================================");
-
+        
+        System.out.println("=============Punto f)=============");
+        System.out.println("Tolerancia: 10^" + (log(TOL) / log(10)));
+        System.out.println("Iteraciones: " + ultimaIteracionGradiente);
+            for (int i = 0; i < solucionF.length; i++) {
+                System.out.println("var"+i+": "+solucionF[i]);
+            }
+             
+        System.out.println("==================================");
+        
+        
+        
         //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
             Scatter example = new Scatter("Comparación norma errores", arregloResiduos);
@@ -644,9 +651,8 @@ con los términos diagonales.
             }
             s++;
         }
-        resultadoGradiente = x;
         ultimaIteracionGradiente = (int) s;
         //System.out.println("Tolerancia del metodo: " + rr + " Tolerancia mia: " + TOL);
-        return resultadoGradiente;
+        return x.clone();
     }
 }
