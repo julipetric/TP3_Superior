@@ -43,9 +43,9 @@ public class TP {
     //PARAMETROS TP
     public static double TOL = pow(10, -35);
     public static int tamMatriz;
-    public static int maxTamMatriz = 20;
+    public static int maxTamMatriz = 75;
     public static int tamGS;
-    public static int maxTamGS = 20;
+    public static int maxTamGS = 75;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -73,13 +73,15 @@ public class TP {
         //Estructuras for para ir guardando las normas del error para graficar despues)
         double residuoMax = 0;
         float residuoMax2 = 0;
+        StopWatch tiempoB = new StopWatch();
+        StopWatch tiempoD = new StopWatch();
+        StopWatch tiempoF = new StopWatch();
         for (tamMatriz = 1; tamMatriz <= maxTamMatriz; tamMatriz++) {
 
             //a)
             make_sys((int) tamMatriz);
 
             //b) FUENTE: http://www.sanfoundry.com/java-program-gaussian-elimination-algorithm/
-            StopWatch tiempoB = new StopWatch();
             tiempoB.reset();
             tiempoB.start();
             solucionB = ge.solve(M, B);
@@ -96,8 +98,9 @@ public class TP {
             } else {
                 arregloResiduos[0][tamMatriz - 1] = (log(residuoMax)) / (log(10));
             }
-            tiempoB.stop();
-            arregloResiduosTiempo[0][tamMatriz - 1] = tiempoB.getTime();
+            //tiempoB.stop();
+            //System.out.println(tiempoB.toString());
+            arregloResiduosTiempo[0][tamMatriz - 1] = (double)(Long)tiempoB.getTime();
 
             //c)
             make_sys2((int) tamMatriz);
@@ -116,12 +119,10 @@ public class TP {
             }
 
             //f)
-            StopWatch tiempoF = new StopWatch();
             tiempoF.reset();
             tiempoF.start();
             make_sys((int) tamMatriz);
             solucionF = gradienteConjugado(M, B, B.clone()/*valores iniciales*/, TOL, maxIteraciones);
-            tiempoF.stop();
             double[] residuoF = solucionF.clone();
             residuoMax = 0;
             for (int i = 0; i < solucionF.length; i++) {
@@ -135,18 +136,15 @@ public class TP {
                     arregloResiduos[3][tamMatriz - 1] = (log(residuoMax)) / (log(10));
                 }
             }
-            arregloResiduosTiempo[2][tamMatriz-1] = tiempoF.getTime();
-            
-            
-            
-            
+            arregloResiduosTiempo[2][tamMatriz - 1] = (double)(Long)tiempoF.getTime();
+
         }
 
         double[] solGS = null;
         double residuoMax3 = 0;
         for (tamGS = 1; tamGS <= maxTamGS; tamGS++) {
             //d)
-            StopWatch tiempoD = new StopWatch();
+
             tiempoD.reset();
             tiempoD.start();
             make_sys(tamGS);
@@ -160,18 +158,17 @@ public class TP {
                     residuoMax3 = residuo3[i];
                 }
             }
-            tiempoD.stop();
             if (residuoMax3 == 0) {
                 arregloResiduos[2][tamGS - 1] = -15.5 + Math.random() * 0.5;
             } else {
                 arregloResiduos[2][tamGS - 1] = (log(residuoMax3)) / (log(10));
             }
-            arregloResiduosTiempo[1][tamGS - 1] = tiempoD.getTime();
+            arregloResiduosTiempo[1][tamGS - 1] = (double)(Long)tiempoD.getTime();
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
-        solucionB = ge.solve(M, B);
-        solucionC = ge.solve2(M2, B2);
+        //solucionB = ge.solve(M, B);
+        //solucionC = ge.solve2(M2, B2);
 
         //TERMINO LA ULTIMA ITERACION
         //TERMINO LA ULTIMA ITERACION
@@ -223,18 +220,16 @@ public class TP {
             System.out.println("Var" + j + "= " + solGS[j]);
         }
         System.out.println("==================================");
-        
+
         System.out.println("=============Punto f)=============");
         System.out.println("Tolerancia: 10^" + (log(TOL) / log(10)));
         System.out.println("Iteraciones: " + ultimaIteracionGradiente);
-            for (int i = 0; i < solucionF.length; i++) {
-                System.out.println("var"+i+": "+solucionF[i]);
-            }
-             
+        for (int i = 0; i < solucionF.length; i++) {
+            System.out.println("var" + i + ": " + solucionF[i]);
+        }
+
         System.out.println("==================================");
-        
-        
-        
+
         //Mostrar gráfico
         SwingUtilities.invokeLater(() -> {
             Scatter example = new Scatter("Comparación norma errores", arregloResiduos);

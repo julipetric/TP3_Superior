@@ -129,7 +129,7 @@ public class Scatter extends JFrame {
 
         dataset.addSeries(series1);
         dataset.addSeries(series2);
-        //ataset.addSeries(series3);
+        dataset.addSeries(series3);
 
         return dataset;
     }
