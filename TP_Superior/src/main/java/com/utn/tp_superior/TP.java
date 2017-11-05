@@ -122,7 +122,7 @@ public class TP {
             make_sys((int) tamMatriz);
             solucionF = gradienteConjugado(M, B, B.clone()/*valores iniciales*/, TOL, maxIteraciones);
             tiempoF.stop();
-            double[] residuoF = solucionF;
+            double[] residuoF = solucionF.clone();
             residuoMax = 0;
             for (int i = 0; i < solucionF.length; i++) {
                 residuoF[i] = ((producto2(M, solucionF))[i] - B[i]);
