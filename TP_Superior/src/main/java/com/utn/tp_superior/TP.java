@@ -41,11 +41,11 @@ public class TP {
     public static float[] solucionC = null;
 
     //PARAMETROS TP
-    public static double TOL = pow(10, -35);
+    public static double TOL = pow(10, -14);
     public static int tamMatriz;
-    public static int maxTamMatriz = 75;
+    public static int maxTamMatriz = 100;
     public static int tamGS;
-    public static int maxTamGS = 75;
+    public static int maxTamGS = 100;
 
     //BANDERAS FORMATO
     public static boolean mostrarMatrizA = false;
@@ -167,8 +167,8 @@ public class TP {
         }
 
         //Hacemos devuelta la ulitma iteracion pq sino no se guarda no se porqué
-        //solucionB = ge.solve(M, B);
-        //solucionC = ge.solve2(M2, B2);
+        solucionB = ge.solve(M, B);
+        solucionC = ge.solve2(M2, B2);
 
         //TERMINO LA ULTIMA ITERACION
         //TERMINO LA ULTIMA ITERACION

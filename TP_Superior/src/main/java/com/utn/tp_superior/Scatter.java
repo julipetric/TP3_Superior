@@ -90,8 +90,8 @@ public class Scatter extends JFrame {
 
         // Create chart
         JFreeChart chart = ChartFactory.createScatterPlot(
-                "Comparación norma errores en función del tiempo de cálculo",
-                "Norma error (escala log10)",
+                "Comparación de tiempo en cada iteracion",
+                "Tamaño de la matriz",
                 "Tiempo de cálculo (ms)",
                 dataset,
                 PlotOrientation.HORIZONTAL,
@@ -114,17 +114,17 @@ public class Scatter extends JFrame {
 
         XYSeries series2 = new XYSeries("Gauss-Seidel");
         for (int i = 0; i < arregloR[1].length; i++) {
-            series2.add(arregloR[2][i], arregloT[1][i]);
+            series2.add(i+1, arregloT[1][i]);
         }
         
         XYSeries series1 = new XYSeries("Gauss");
         for (int i = 0; i < arregloR[1].length; i++) {
-            series1.add(arregloR[0][i], arregloT[0][i]);
+            series1.add(i+1, arregloT[0][i]);
         }
         
         XYSeries series3 = new XYSeries("Gradientes conjugados");
         for (int i = 0; i < arregloR[3].length; i++) {
-            series3.add(arregloR[3][i], arregloT[2][i]);
+            series3.add(i+1, arregloT[2][i]);
         }
 
         dataset.addSeries(series1);
